@@ -1,8 +1,8 @@
-import pyautogui
 import discord
 from discord.ext import commands
 import json
 import os
+import flet as ft
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -28,4 +28,10 @@ async def on_message(message):#メッセージをなにかしら受け取った�
     #それ以外はコマンド実行
     await message.channel.send('メッセージを受信しました。')
 
+
+def main(page: ft.Page):
+    t = ft.Text(value="Hello, world!")
+    page.add(t)
+
+ft.app(target=main)
 client.run(os.environ["discord_api_key"])
