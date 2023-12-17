@@ -1,0 +1,2 @@
+# multi_task_assistant_for_discord
+discordbotを使って様々なアシスタントをさせるためのコード
