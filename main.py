@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import json
 import os
+from server import keep_alive
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -31,5 +32,7 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
   else:
     await message.channel.send('メッセージを受信しました。')
 
+# ウェブサーバーを起動する
+keep_alive()
 
-client.run(os.environ["discord_api_key"])
+client.run()
