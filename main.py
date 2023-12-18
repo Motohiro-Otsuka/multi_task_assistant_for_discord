@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import json
-import os
+#import os
 from server import keep_alive
 
 intents = discord.Intents.default()
@@ -11,6 +11,9 @@ intents.members = True
 intents.message_content = True  # メッセージに関するデバッグ情報を有効化
 client = commands.Bot(command_prefix="/", intents=intents)
 
+conf_file = open("./config/discord_conf.json","r")
+config = json.load(conf_file)
+discord_api_key = config["flare_assistant"]["discord_api_key"]
 
 @client.event
 async def on_ready():
@@ -35,4 +38,4 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 # ウェブサーバーを起動する
 keep_alive()
 
-client.run()
+client.run(discord_api_key)
