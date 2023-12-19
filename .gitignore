@@ -1,6 +1,8 @@
 config/discord_conf.json
+config/assistant_function_conf.json
 .replit
 poetry.lock
 pyproject.toml
 server.py
 __pycache__/*
+task_scr/__pycache__/*
