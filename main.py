@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import json
-from task_scr import parrot
+from task_scr import parrot,chat_openai
 
 conf_file = open("./config/assistant_function_conf.json","r")
 allow_function = json.load(conf_file)
@@ -29,10 +29,13 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 	if type(message.channel) is discord.Thread:  #スレッドでメッセージを受け取った時
 		if message.author == client.user or message.author.bot:  #メッセージの送り主がbotの時は処理しない
 			pass
-		elif message.channel.id not in allow_recoed_thread_id:  #録画を許可しないスレッドは処理しない
+		elif False:#message.channel.id not in allow_recoed_thread_id:  #録画を許可しないスレッドは処理しない
 			pass
 		else:  #ここに保存コマンドを書く
-			pass
+			#chatgptへの問い合わせ場合
+			if(chat_openai.check_chatgpt_thread(message.channel.id) and allow_function["chat"]):
+				await chat_openai.response_chatgpt(message.channel,message.content)
+
 	#それ以外はコマンド実行
 	if message.author == client.user or message.author.bot:
 		pass
@@ -50,6 +53,15 @@ async def wrapper_parrot(ctx,text):
 	else:
 		await ctx.send("この機能は使用できません。")
 
+@client.command("chat")
+async def wrapper_parrot(ctx,text):
+	try:
+		if(allow_function["chat"]):
+			await chat_openai.new_chat(ctx,text)
+		else:
+			await ctx.send("この機能は使用できません。")
+	except Exception as e:
+		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
 # ウェブサーバーを起動する
 # ToDo ない場合は読み込まない
