@@ -1,0 +1,40 @@
+{
+    "common":{
+        "discord_api_key":"Enter your discord api key",
+        "use_replit":true
+        },
+    "function":{
+        "parrot":{
+            "use":true,
+            "discription":"オウム返しする"
+            },
+        "chat_openai":{
+            "use":true,
+            "discription":"chatGPTを使ってチャットボットの応答をする",
+            "OPENAI_API_KEY":"Enter your openai api key",
+            "model":"gpt-3.5-turbo-1106",
+            "system_prompt":"あなたは親切なアシスタントです。",
+            "max_tokens":"200",
+            "temperature":"0.7",
+            "max_log":"5"
+            },
+        "live_scheduler":{
+            "use":true,
+            "discription":"chatGPTを使ってチャットボットの応答をする",
+            "files":{
+                "icons":{
+                    "name":"共有URL"
+                },
+                "contents":{
+                    "スプラ":"共有URL",
+                    "雑談":"共有URL"
+                },
+                "format":"共有URL"
+            }
+        }
+
+    }
+
+
+
+}

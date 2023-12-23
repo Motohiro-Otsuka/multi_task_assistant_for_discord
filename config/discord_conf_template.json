@@ -1,8 +1,0 @@
-{
-    "bot_name1":{
-        "discord_api_key":"",
-        "support_command":{
-            "/command1":"discription or prompt"
-        }
-    }
-}
