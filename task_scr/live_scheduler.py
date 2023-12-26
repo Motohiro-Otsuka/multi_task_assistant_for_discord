@@ -64,19 +64,6 @@ class LiveScheduer:
             for column_key,column_point in self.column_first_point.items():
                 loop = 1 if column_key != "liver" else len(val[column_key].keys())
                 size = self.column_size[column_key]
-                """
-                for j in range(loop):
-                    draw.line(( column_point["x"],
-                                column_point["y"]+size["y"]*i,
-                                column_point["x"]+size["x"]*(j+1),
-                                column_point["y"]+size["y"]*i ),
-                                fill=(255, 0, 255), width=1)
-                    draw.line(( column_point["x"]+size["x"]*(j+1),
-                                column_point["y"]+size["y"]*i,
-                                column_point["x"]+size["x"]*(j+1),
-                                column_point["y"]+size["y"]*(i+1)),
-                                fill=(255, 0, 255), width=1)
-                """
                 if (column_key == "day"):
                     j = 0
                     for d in key:
@@ -119,15 +106,7 @@ class LiveScheduer:
                     base_image.paste(platform_images[val["サイト"]] ,
                                     (column_point["x"]+c_x,column_point["y"]+size["y"]*i+c_y))
             i += 1
-        """
-        for i in range(30):
-            draw.line((0, 145+70*i, 1920 ,145+70*i), fill=(255, 0, 255), width=1)
-        """
-        """
-        for key,val in liver_images.items():
-            base_image.paste(val,(0,200*i))
-            i += 1
-        """
+
         await self.return_schedule_picture(base_image,ctx)
 
     async def print_grid_schedule_baseimg(self,ctx=None):
@@ -145,55 +124,6 @@ class LiveScheduer:
             else:
                 draw.line((0,i ,img_width ,i), fill=(240, 230, 140), width=1)
         await self.return_schedule_picture(base_image,ctx)
-
-    async def show_schedule_data(self,ctx=None):
-        pass
-
-    def get_schedule(self):#エクセルファイルからスケジュールを取得する
-        def load_excel(excel_file_path):
-            wb = openpyxl.load_workbook(excel_file_path)
-            ws = wb.worksheets[0]
-            #labelの取得
-            for i in range(4):
-                content = ws.cell(2, label_start_idx+i)#C2セルから
-                label.append(content.value)
-            #ライバーの取得
-            i = 0
-            while True:
-                liver_name = ws.cell(2, liver_start_idx+i)#G2セルから
-                if(liver_name.value == None):
-                    break
-                liver.append(liver_name.value)
-                i += 1
-            #スケジュールの取得
-            for i in range(7):
-                date = ws.cell(3+i, 2)
-                schedule[str(date.value)] = {"liver":{}}
-                #配信情報を取得
-                for j in range(len(label)):
-                    content = ws.cell(3+i, label_start_idx+j)
-                    schedule[str(date.value)][label[j]] = content.value
-                for j in range(len(liver)):
-                    liver_state = ws.cell(3+i, liver_start_idx+j)
-                    schedule[str(date.value)]["liver"][liver[j]] = liver_state.value
-            wb.close()
-            return schedule
-
-        schedule = {}
-        label = []
-        liver = []
-        label_start_idx = 3
-        liver_start_idx = 7
-        if(self.use_drive):
-            excel_file_id = self.schedule.split("/")[5]
-            excle_wb = self.drive.CreateFile({'id': excel_file_id})
-            with tempfile.TemporaryDirectory() as temp_dir:
-                excel_file_path = '{}/schedule.xlsx'.format(temp_dir)
-                excle_wb.GetContentFile(excel_file_path)
-                return load_excel(excel_file_path)
-        else:
-            excel_file_path = self.schedule
-            return load_excel(excel_file_path)
 
     def image_resize(self,img,column_name):
         img_x,img_y = img.size
