@@ -1,6 +1,6 @@
-config/discord_conf.json
-config/assistant_function_conf.json
-config/openai_conf.json
+config/config.json
+config/client_secrets.json
+config/saved_credentials.json
 .replit
 poetry.lock
 pyproject.toml
