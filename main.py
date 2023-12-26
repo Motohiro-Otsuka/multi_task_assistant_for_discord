@@ -101,6 +101,16 @@ async def wrapper_chat_openai(ctx):
 	except Exception as e:
 		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
+@client.command("schedule-show")
+async def wrapper_chat_openai(ctx):
+	try:
+		if(live_scheduler_cls!=None):
+			await live_scheduler_cls.show_schedule_data(ctx)
+		else:
+			await ctx.send("この機能は使用できません。")
+	except Exception as e:
+		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
 
 
 # ウェブサーバーを起動する

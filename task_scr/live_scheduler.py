@@ -174,12 +174,83 @@ class LiveScheduer:
     def get_number_picture(self):
         return self.get_icons(self.number_img,"number_img")
 
+    async def show_schedule_data(self,ctx=None):
+        schedule_obj = self.get_schedule()
+        response = ""
+        for date,date_item in schedule_obj.items():
+            response += "- {}日\n".format(date)
+            for column,val in date_item.items():
+                if(column=="liver"):
+                    response += "  - 参加の可否\n" 
+                    for name,assign in val.items():
+                        response += "    - {}:{}\n".format(name,assign)
+                elif(column=="開始時間" or column=="終了時間"):
+                    response += "  - {}:{}\n".format(column,val.strftime("%H:%M")) 
+                else:
+                    response += "  - {}:{}\n".format(column,val)
+        channel = ctx.channel #メッセージがあったチャンネルの取得
+        #スレッド名の定義
+        date = datetime.datetime.now()
+        date_str = date.strftime('%Y-%m-%d %H:%M')
+        thread_name = '{}現在のスケジュール'.format(date_str)
+        #スレッドの作成
+        thread = await channel.create_thread(name=thread_name,reason="スケジュール確認",type=discord.ChannelType.public_thread)#スレッドを作る
+        # メッセージを送信してスレッドを開始します。
+        await thread.send(response)
+
+    def get_schedule(self):#エクセルファイルからスケジュールを取得する
+        def load_excel(excel_file_path):
+            wb = openpyxl.load_workbook(excel_file_path)
+            ws = wb.worksheets[0]
+            #labelの取得
+            for i in range(4):
+                content = ws.cell(2, label_start_idx+i)#C2セルから
+                label.append(content.value)
+            #ライバーの取得
+            i = 0
+            while True:
+                liver_name = ws.cell(2, liver_start_idx+i)#G2セルから
+                if(liver_name.value == None):
+                    break
+                liver.append(liver_name.value)
+                i += 1
+            #スケジュールの取得
+            for i in range(7):
+                date = ws.cell(3+i, 2)
+                schedule[str(date.value)] = {"liver":{}}
+                #配信情報を取得
+                for j in range(len(label)):
+                    content = ws.cell(3+i, label_start_idx+j)
+                    schedule[str(date.value)][label[j]] = content.value
+                for j in range(len(liver)):
+                    liver_state = ws.cell(3+i, liver_start_idx+j)
+                    schedule[str(date.value)]["liver"][liver[j]] = liver_state.value
+            wb.close()
+            return schedule
+
+        schedule = {}
+        label = []
+        liver = []
+        label_start_idx = 3
+        liver_start_idx = 7
+        if(self.use_drive):
+            excel_file_id = self.schedule.split("/")[5]
+            excle_wb = self.drive.CreateFile({'id': excel_file_id})
+            with tempfile.TemporaryDirectory() as temp_dir:
+                excel_file_path = '{}/schedule.xlsx'.format(temp_dir)
+                excle_wb.GetContentFile(excel_file_path)
+                return load_excel(excel_file_path)
+        else:
+            excel_file_path = self.schedule
+            return load_excel(excel_file_path)
+
+
 if __name__ == "__main__":#検証用コード
     config_file = open("../config/config.json","r",encoding="utf-8")
     config = json.load(config_file)
     function_config = config["function"]
     live_scheduler = LiveScheduer(function_config["live_scheduler"])
-    live_scheduler.print_schedule()
+    live_scheduler.show_schedule_data()
     #for key,val in pil_imgs.items():
     #    
     shutil.rmtree("tmp")
