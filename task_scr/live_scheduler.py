@@ -42,6 +42,15 @@ class LiveScheduer:
         column_y = self.column_size[column_key]["y"]
         return int ((column_x-x)/2),int ((column_y-y)/2)
 
+    async def return_schedule_picture(self,img,ctx):
+        if (ctx == None):
+            img.show()
+        else:
+            os.makedirs(self.tmp_dir_path, exist_ok=True)
+            img_path = os.path.join(self.tmp_dir_path,"schedule.png")
+            img.save(img_path)
+            await ctx.send(file=discord.File(img_path))
+
     async def print_schedule(self,ctx=None):
         schedule_obj = self.get_schedule()
         base_image = self.get_schedule_base_image()
@@ -119,13 +128,26 @@ class LiveScheduer:
             base_image.paste(val,(0,200*i))
             i += 1
         """
-        if (ctx == None):
-            base_image.show()
-        else:
-            os.makedirs(self.tmp_dir_path, exist_ok=True)
-            img_path = os.path.join(self.tmp_dir_path,"schedule.png")
-            base_image.save(img_path)
-            await ctx.send(file=discord.File(img_path))
+        await self.return_schedule_picture(base_image,ctx)
+
+    async def print_grid_schedule_baseimg(self,ctx=None):
+        base_image = self.get_schedule_base_image()
+        img_width,img_height = base_image.size
+        draw = ImageDraw.Draw(base_image)
+        for i in range(0,img_width,10):#10pxごとに縦線を引く
+            if(i % 50 == 0):
+                draw.line((i,0 ,i ,img_height), fill=(255, 0, 0), width=1)
+            else:
+                draw.line((i,0 ,i ,img_height), fill=(240, 230, 140), width=1)
+        for i in range(0,img_height,10):#10pxごとに横線を引く
+            if(i % 50 == 0):
+                draw.line((0,i ,img_width ,i), fill=(255, 0, 0), width=1)
+            else:
+                draw.line((0,i ,img_width ,i), fill=(240, 230, 140), width=1)
+        await self.return_schedule_picture(base_image,ctx)
+
+    async def show_schedule_data(self,ctx=None):
+        pass
 
     def get_schedule(self):#エクセルファイルからスケジュールを取得する
         def load_excel(excel_file_path):
@@ -173,8 +195,6 @@ class LiveScheduer:
             excel_file_path = self.schedule
             return load_excel(excel_file_path)
 
-        
-
     def image_resize(self,img,column_name):
         img_x,img_y = img.size
         column_x_size = self.column_size[column_name]["x"]
@@ -182,7 +202,6 @@ class LiveScheduer:
         content_scale = column_x_size / img_x if  column_x_size / img_x < column_y_size / img_y else column_y_size / img_y
         content_scale = content_scale-0.05
         return img.resize((int(img_x*content_scale),int(img_y*content_scale)))
-        
 
     def get_image(self,img_id):
         if(self.use_drive):
