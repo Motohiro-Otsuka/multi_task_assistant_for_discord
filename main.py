@@ -88,6 +88,30 @@ async def wrapper_chat_openai(ctx):
 	except Exception as e:
 		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
+#スケジュール画像にグリッドを表示
+@client.command("schedule-grid")
+async def wrapper_chat_openai(ctx):
+	try:
+		if(live_scheduler_cls!=None):
+			await ctx.send("グリッドを入れたscheduleのベースイメージを作成中\n生成までしばらくお待ちください。")
+			await live_scheduler_cls.print_grid_schedule_baseimg(ctx)
+			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+		else:
+			await ctx.send("この機能は使用できません。")
+	except Exception as e:
+		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
+@client.command("schedule-show")
+async def wrapper_chat_openai(ctx):
+	try:
+		if(live_scheduler_cls!=None):
+			await live_scheduler_cls.show_schedule_data(ctx)
+		else:
+			await ctx.send("この機能は使用できません。")
+	except Exception as e:
+		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
+
 
 # ウェブサーバーを起動する
 # ToDo ない場合は読み込まない
