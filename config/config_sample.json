@@ -1,7 +1,9 @@
 {
     "common":{
         "discord_api_key":"Enter your discord api key",
-        "use_replit":true
+        "use_replit":true,
+        "use_google_drive": true,
+        "google_dirive_setting":"./config/google_drive_settings.yaml"
         },
     "function":{
         "parrot":{

@@ -18,11 +18,14 @@ from pydrive2.drive import GoogleDrive
 import time
 
 class LiveScheduer:
-    def __init__(self,config,gdrive_setting_path=""):
-        print("->",gdrive_setting_path)
-        gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
-        gauth.LocalWebserverAuth()
-        self.drive = GoogleDrive(gauth)
+    def __init__(self,config,use_drive,gdrive_setting_path=""):
+        self.use_drive = use_drive
+        if(self.use_drive):
+            gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
+            gauth.LocalWebserverAuth()
+            self.drive = GoogleDrive(gauth)
+        else:
+            pass
         self.config = config
         self.tmp_dir_path = self.config["files"]["tmp_dir_path"]
         self.icons = self.config["files"]["icons"]
@@ -125,16 +128,7 @@ class LiveScheduer:
             await ctx.send(file=discord.File(img_path))
 
     def get_schedule(self):#エクセルファイルからスケジュールを取得する
-        schedule = {}
-        label = []
-        liver = []
-        excel_file_id = self.schedule.split("/")[5]
-        excle_wb = self.drive.CreateFile({'id': excel_file_id})
-        label_start_idx = 3
-        liver_start_idx = 7
-        with tempfile.TemporaryDirectory() as temp_dir:
-            excel_file_path = '{}/schedule.xlsx'.format(temp_dir)
-            excle_wb.GetContentFile(excel_file_path)
+        def load_excel(excel_file_path):
             wb = openpyxl.load_workbook(excel_file_path)
             ws = wb.worksheets[0]
             #labelの取得
@@ -161,7 +155,25 @@ class LiveScheduer:
                     liver_state = ws.cell(3+i, liver_start_idx+j)
                     schedule[str(date.value)]["liver"][liver[j]] = liver_state.value
             wb.close()
-        return schedule
+            return schedule
+
+        schedule = {}
+        label = []
+        liver = []
+        label_start_idx = 3
+        liver_start_idx = 7
+        if(self.use_drive):
+            excel_file_id = self.schedule.split("/")[5]
+            excle_wb = self.drive.CreateFile({'id': excel_file_id})
+            with tempfile.TemporaryDirectory() as temp_dir:
+                excel_file_path = '{}/schedule.xlsx'.format(temp_dir)
+                excle_wb.GetContentFile(excel_file_path)
+                return load_excel(excel_file_path)
+        else:
+            excel_file_path = self.schedule
+            return load_excel(excel_file_path)
+
+        
 
     def image_resize(self,img,column_name):
         img_x,img_y = img.size
@@ -173,10 +185,13 @@ class LiveScheduer:
         
 
     def get_image(self,img_id):
-        img = self.drive.CreateFile({'id': img_id})
-        os.makedirs(self.tmp_dir_path, exist_ok=True)
-        img_path = os.path.join(self.tmp_dir_path,"{}.png".format(img_id))
-        img.GetContentFile(img_path)
+        if(self.use_drive):
+            img = self.drive.CreateFile({'id': img_id})
+            os.makedirs(self.tmp_dir_path, exist_ok=True)
+            img_path = os.path.join(self.tmp_dir_path,"{}.png".format(img_id))
+            img.GetContentFile(img_path)
+        else:
+            img_path = img_id
         image_obj = Image.open(img_path)
         return image_obj
 
@@ -187,9 +202,15 @@ class LiveScheduer:
         icon_objects = {}
         for key,val in icon_paths.items():
             if(grid_name == "number_img"):
-                icon_objects[key]=self.get_image(val.split("/")[5])
+                if(self.use_drive):
+                    icon_objects[key]=self.get_image(val.split("/")[5])
+                else:
+                    icon_objects[key]=self.get_image(val)
             else:
-                icon_objects[key]=self.image_resize(self.get_image(val.split("/")[5]),grid_name)
+                if(self.use_drive):
+                    icon_objects[key]=self.image_resize(self.get_image(val.split("/")[5]),grid_name)
+                else:
+                    icon_objects[key]=self.image_resize(self.get_image(val),grid_name)
         return icon_objects
 
     def get_liver_icon(self):
