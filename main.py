@@ -45,8 +45,8 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 			pass
 		else:  #ここに保存コマンドを書く
 			#chatgptへの問い合わせ場合
-			if(chat_openai.check_chatgpt_thread(message.channel.id) and chat_openai_cls != None):
-				await chat_openai.response_chatgpt(message.channel,message.content)
+			if(chat_openai_cls.check_chatgpt_thread(message.channel.id) and chat_openai_cls != None):
+				await chat_openai_cls.response_chatgpt(message.channel,message.content)
 	#それ以外はコマンド実行
 	if message.author == client.user or message.author.bot:
 		pass
