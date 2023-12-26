@@ -13,7 +13,7 @@ function_config = config["function"]
 ## 各機能ごとのconfig取り出し
 parrot_cls = parrot.Parrot(function_config["parrot"]) if function_config["parrot"]["use"] == True else None
 chat_openai_cls = chat_openai.ChatOpenai(function_config["chat_openai"]) if function_config["chat_openai"]["use"] == True else None
-live_scheduler_cls = live_scheduler.LiveScheduer(function_config["live_scheduler"],common_config["google_dirive_setting"]) if function_config["live_scheduler"]["use"] == True else None
+live_scheduler_cls = live_scheduler.LiveScheduer(function_config["live_scheduler"],common_config["use_google_drive"],common_config["google_dirive_setting"]) if function_config["live_scheduler"]["use"] == True else None
 
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]
