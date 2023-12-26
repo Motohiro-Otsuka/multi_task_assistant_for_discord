@@ -20,21 +20,85 @@
             },
         "live_scheduler":{
             "use":true,
+            "googleDrive":true,
             "discription":"chatGPTを使ってチャットボットの応答をする",
             "files":{
                 "icons":{
-                    "name":"共有URL"
+                    "name":"googleDrive共有リンク or local file path"
                 },
                 "contents":{
-                    "スプラ":"共有URL",
-                    "雑談":"共有URL"
+                    "スプラ":"googleDrive 共有リンクor local file path",
+                    "雑談":"googleDrive 共有リンクor local file path"
                 },
-                "format":"共有URL"
+                "platform":{
+                    "YouTube":"googleDrive 共有リンクor local file path",
+                    "ミラティブ":"googleDrive 共有リンクor local file path",
+                    "ツイキャス":"googleDrive 共有リンクor local file path",
+                    "ニコ生":"googleDrive 共有リンクor local file path"
+                },
+                "number_img":{
+                    "0":"googleDrive 共有リンクor local file path",
+                    "1":"googleDrive 共有リンクor local file path",
+                    "2":"googleDrive 共有リンクor local file path",
+                    "3":"googleDrive 共有リンクor local file path",
+                    "4":"googleDrive 共有リンクor local file path",
+                    "5":"googleDrive 共有リンクor local file path",
+                    "6":"googleDrive 共有リンクor local file path",
+                    "7":"googleDrive 共有リンクor local file path",
+                    "8":"googleDrive 共有リンクor local file path",
+                    "9":"googleDrive 共有リンクor local file path",
+                    ":":"googleDrive 共有リンクor local file path"
+                },
+                "format":"googleDrive 共有リンクor local file path",
+                "schedule":"googleDrive 共有リンクor local file path",
+                "tmp_dir_path":"tmp"
+            },
+            "grid":{
+                "column_size":{
+                    "day":{
+                        "x":30,
+                        "y":70
+                    },
+                    "time":{
+                        "x":20,
+                        "y":70
+                    },
+                    "content":{
+                        "x":340,
+                        "y":70
+                    },
+                    "liver":{
+                        "x":78,
+                        "y":70
+                    },
+                    "platform":{
+                        "x":130,
+                        "y":70
+                    }
+                },
+                "column_first_point":{
+                    "day":{
+                        "x":95,
+                        "y":145
+                    },
+                    "time":{
+                        "x":170,
+                        "y":145
+                    },
+                    "content":{
+                        "x":280,
+                        "y":145
+                    },
+                    "liver":{
+                        "x":620,
+                        "y":145
+                    },
+                    "platform":{
+                        "x":930,
+                        "y":145
+                    }
+                }
             }
         }
-
     }
-
-
-
 }

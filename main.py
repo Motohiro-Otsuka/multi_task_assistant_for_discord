@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 import json
-from task_scr import parrot,chat_openai
+import shutil
+from task_scr import parrot,chat_openai,live_scheduler
 
 #configの読み込み
 config_file = open("./config/config.json","r",encoding="utf-8")
@@ -12,7 +13,7 @@ function_config = config["function"]
 ## 各機能ごとのconfig取り出し
 parrot_cls = parrot.Parrot(function_config["parrot"]) if function_config["parrot"]["use"] == True else None
 chat_openai_cls = chat_openai.ChatOpenai(function_config["chat_openai"]) if function_config["chat_openai"]["use"] == True else None
-#live_scheduler = function_config["live_scheduler"]
+live_scheduler_cls = live_scheduler.LiveScheduer(function_config["live_scheduler"],common_config["google_dirive_setting"]) if function_config["live_scheduler"]["use"] == True else None
 
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]
@@ -63,6 +64,7 @@ async def wrapper_parrot(ctx,text):
 	else:
 		await ctx.send("この機能は使用できません。")
 
+#chat GPTによるチャット
 @client.command("chat")
 async def wrapper_chat_openai(ctx,text):
 	try:
@@ -72,6 +74,20 @@ async def wrapper_chat_openai(ctx,text):
 			await ctx.send("この機能は使用できません。")
 	except Exception as e:
 		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
+#スケジュール画像の表示
+@client.command("schedule-print")
+async def wrapper_chat_openai(ctx):
+	try:
+		if(live_scheduler_cls!=None):
+			await ctx.send("スケジュール画像の生成を受け付けました。\n生成までしばらくお待ちください。")
+			await live_scheduler_cls.print_schedule(ctx)
+			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+		else:
+			await ctx.send("この機能は使用できません。")
+	except Exception as e:
+		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
 
 # ウェブサーバーを起動する
 # ToDo ない場合は読み込まない
