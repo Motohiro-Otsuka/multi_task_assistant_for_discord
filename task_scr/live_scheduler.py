@@ -35,6 +35,17 @@ class LiveScheduer:
         self.number_img = self.config["files"]["number_img"]
         self.column_size = self.config["grid"]["column_size"]
         self.column_first_point = self.config["grid"]["column_first_point"]
+        self.editing_dic = {}#{"thread-id":{"schedule":{},status=["choice","edit","end"],day="",timestamp:""}}
+
+    def check_schedule_editing(self,thread_id):
+        """
+        すでにchatのスレッドが立っているか確認するための
+        """
+        if (thread_id in self.editing_dic):
+            return True
+        else:
+            return False
+
 
     def centering(self,img,column_key):
         x,y = img.size
@@ -174,20 +185,50 @@ class LiveScheduer:
     def get_number_picture(self):
         return self.get_icons(self.number_img,"number_img")
 
-    async def show_schedule_data(self,ctx=None):
-        schedule_obj = self.get_schedule()
+    def schedule_json_to_markdown(self,date,date_item):
+        response = "- {}日\n".format(date)
+        for column,val in date_item.items():
+            if(column=="liver"):
+                response += "  - liver\n" 
+                for name,assign in val.items():
+                    response += "    - {}:{}\n".format(name,assign)
+            elif(column=="開始時間" or column=="終了時間"):
+                response += "  - {}:{}\n".format(column,val.strftime("%H:%M")) 
+            else:
+                response += "  - {}:{}\n".format(column,val)
+        return response
+        
+    def schedule_all_json_to_markdown(self,schedule=None):
+        schedule_obj = self.get_schedule() if schedule==None else schedule
         response = ""
         for date,date_item in schedule_obj.items():
-            response += "- {}日\n".format(date)
-            for column,val in date_item.items():
-                if(column=="liver"):
-                    response += "  - 参加の可否\n" 
-                    for name,assign in val.items():
-                        response += "    - {}:{}\n".format(name,assign)
-                elif(column=="開始時間" or column=="終了時間"):
-                    response += "  - {}:{}\n".format(column,val.strftime("%H:%M")) 
+            response += self.schedule_json_to_markdown(date,date_item)
+        return response
+
+    def schedule_markdown_to_json(self,text):
+        result = {}
+        liver={}
+        for line in text.split("\n")[1:]:
+            line_list = line.split(" ")
+            if(len(line_list)==2):#日付
+                pass
+            elif(len(line_list)==4):
+                if(line_list[-1]=="liver"):
+                    result[line_list[-1]] = {}
                 else:
-                    response += "  - {}:{}\n".format(column,val)
+                    tmp = line_list[-1].split(":")
+                    if(len(tmp)==3):
+                        result[tmp[0]]=datetime.datetime.strptime("{}:{}".format(tmp[1],tmp[2]),"%H:%M")
+                    else:
+                        result[tmp[0]]=tmp[1]
+            elif(len(line_list)==6):
+                tmp = line_list[-1].split(":")
+                liver[tmp[0]]=tmp[1]
+        result["liver"] = liver
+        return result 
+
+    async def show_schedule_data(self,ctx=None):
+        response = self.schedule_all_json_to_markdown()
         channel = ctx.channel #メッセージがあったチャンネルの取得
         #スレッド名の定義
         date = datetime.datetime.now()
@@ -227,7 +268,6 @@ class LiveScheduer:
                     schedule[str(date.value)]["liver"][liver[j]] = liver_state.value
             wb.close()
             return schedule
-
         schedule = {}
         label = []
         liver = []
@@ -244,6 +284,72 @@ class LiveScheduer:
             excel_file_path = self.schedule
             return load_excel(excel_file_path)
 
+    async def save_new_schedule(self,trehad_id,new_sheet=False):
+        def edit_excel_schedule(excel_file_path):
+            label_start_idx = 3
+            liver_start_idx = 7
+            wb = openpyxl.load_workbook(excel_file_path)
+            ws = wb.worksheets[0]
+            schedule_items = self.editing_dic[trehad_id]["schedule"].items()
+            i = 0
+            for day, items in schedule_items:
+                for key, val in items.items():
+                    if(key == "開始時間"):#C列 = 3
+                        ws.cell(i+3, 3).value = val
+                    elif(key == "終了時間"):#D列 = 4
+                        ws.cell(i+3, 4).value = val
+                    elif(key == "内容"):#E列 = 5
+                        ws.cell(i+3, 5).value = val
+                    elif(key == "サイト"):#F列 = 6
+                        ws.cell(i+3, 6).value = val
+                    elif(key == "liver"):#G列以降 = 7以降
+                        j = 0
+                        for liver,assign in val.items():
+                            ws.cell(i+3, 7+j).value = assign
+                            j+=1
+                i += 1
+            wb.save(excel_file_path)
+            wb.close()
+        if(self.use_drive):
+            excel_file_id = self.schedule.split("/")[5]
+            excle_wb = self.drive.CreateFile({'id': excel_file_id})
+            with tempfile.TemporaryDirectory() as temp_dir:
+                excel_file_path = '{}/schedule.xlsx'.format(temp_dir)
+                excle_wb.GetContentFile(excel_file_path)
+                edit_excel_schedule(excel_file_path)
+                excle_wb.SetContentFile(excel_file_path)
+                await excle_wb.Upload()
+        else:
+            excel_file_path = self.schedule
+            edit_excel_schedule(excel_file_path)
+
+    async def edit_schedule(self,thread,text=""):
+        if(thread.id in self.editing_dic):#すでに編集中の時
+            if(self.editing_dic[thread.id]["status"] == "choice"):#日付選択直後
+                if(text in self.editing_dic[thread.id]["schedule"]):
+                    choiced_schedule = self.schedule_json_to_markdown(int(text),self.editing_dic[thread.id]["schedule"][text])
+                    self.editing_dic[thread.id]["status"] = "edit"
+                    self.editing_dic[thread.id]["editing_day"]=text
+                    await thread.send("次の箇条書きをコピーして、変更しスレッドに送信してください")
+                    await thread.send(choiced_schedule)
+                else:
+                    await thread.send("{}日は対象外です。\n日付を選びなおしてください。".format(text))
+            elif(self.editing_dic[thread.id]["status"] == "edit"):#日付選択直後
+                new_schedule = self.schedule_markdown_to_json(text)
+                day = self.editing_dic[thread.id]["editing_day"] 
+                self.editing_dic[thread.id]["schedule"][day] = new_schedule
+                await thread.send(self.schedule_all_json_to_markdown(self.editing_dic[thread.id]["schedule"]))
+                await thread.send("変更後は上記のようになりました。")
+                self.save_new_schedule(thread.id)
+                await thread.send("別の日程を変更する場合はもう一度schedule-editコマンドを叩いてください")
+            #入力されたmarkdownを処理してスケジュールを更新する
+            #先にスケジュールを作るコードを実装する
+        else:#初めての場合は1週間のスケジュールを返す
+            schedule_obj = self.get_schedule()
+            print(schedule_obj)
+            self.editing_dic[thread.id] = {"schedule":schedule_obj,"status":"choice","editing_day":None,"timestamp":datetime.datetime.now()}
+            await thread.send(self.schedule_all_json_to_markdown())
+            await thread.send("変更したい日の日付を数字で答えてください")
 
 if __name__ == "__main__":#検証用コード
     config_file = open("../config/config.json","r",encoding="utf-8")
@@ -251,6 +357,4 @@ if __name__ == "__main__":#検証用コード
     function_config = config["function"]
     live_scheduler = LiveScheduer(function_config["live_scheduler"])
     live_scheduler.show_schedule_data()
-    #for key,val in pil_imgs.items():
-    #    
     shutil.rmtree("tmp")

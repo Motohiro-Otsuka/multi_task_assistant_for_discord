@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import json
 import shutil
+import datetime 
 from task_scr import parrot,chat_openai,live_scheduler
 
 #configの読み込み
@@ -47,6 +48,9 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 			#chatgptへの問い合わせ場合
 			if(chat_openai_cls.check_chatgpt_thread(message.channel.id) and chat_openai_cls != None):
 				await chat_openai_cls.response_chatgpt(message.channel,message.content)
+			if(live_scheduler_cls.check_schedule_editing(message.channel.id) and live_scheduler_cls != None):
+				await live_scheduler_cls.edit_schedule(message.channel,message.content)
+	
 	#それ以外はコマンド実行
 	if message.author == client.user or message.author.bot:
 		pass
@@ -110,6 +114,23 @@ async def wrapper_chat_openai(ctx):
 			await ctx.send("この機能は使用できません。")
 	except Exception as e:
 		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
+@client.command("schedule-edit")
+async def wrapper_chat_openai(ctx):
+	try:
+		if(live_scheduler_cls!=None):
+			channel = ctx.channel
+			date = datetime.datetime.now()
+			date_str = date.strftime('%Y-%m-%d %H:%M')
+			thread_name = '{}現在のスケジュール'.format(date_str)
+			#スレッドの作成
+			thread = await channel.create_thread(name=thread_name,reason="スケジュール編集",type=discord.ChannelType.public_thread)#スレッドを作る
+			await live_scheduler_cls.edit_schedule(thread)
+		else:
+			await ctx.send("この機能は使用できません。")
+	except Exception as e:
+		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
 
 
 
