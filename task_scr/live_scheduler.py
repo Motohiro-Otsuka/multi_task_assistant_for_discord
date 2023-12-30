@@ -1,4 +1,5 @@
-import datetime 
+import datetime
+from zoneinfo import ZoneInfo
 import discord
 from discord.ext import commands
 import tempfile
@@ -240,11 +241,11 @@ class LiveScheduer:
         response = self.schedule_all_json_to_markdown()
         channel = ctx.channel #メッセージがあったチャンネルの取得
         #スレッド名の定義
-        date = datetime.datetime.now()
+        date = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
         date_str = date.strftime('%Y-%m-%d %H:%M')
         thread_name = '{}現在のスケジュール'.format(date_str)
         #スレッドの作成
-        thread = await channel.create_thread(name=thread_name,reason="スケジュール確認",type=discord.ChannelType.public_thread)#スレッドを作る
+        thread = await channel.create_thread(name=thread_name,reason="スケジュール確認",type=discord.ChannelType.public_thread,auto_archive_duration=60)#スレッドを作る
         # メッセージを送信してスレッドを開始します。
         await thread.send(response)
 

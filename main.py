@@ -3,7 +3,7 @@ from discord.ext import commands
 import json
 import shutil
 import datetime 
-from task_scr import parrot,chat_openai,live_scheduler
+from task_scr import help,parrot,chat_openai,live_scheduler
 
 #configの読み込み
 config_file = open("./config/config.json","r",encoding="utf-8")
@@ -11,10 +11,15 @@ config = json.load(config_file)
 common_config= config["common"]
 function_config = config["function"]
 
+parrot_config = function_config["parrot"]
+chat_openai_config = function_config["chat_openai"]
+live_scheduler_config = function_config["live_scheduler"]
+
 ## 各機能ごとのconfig取り出し
-parrot_cls = parrot.Parrot(function_config["parrot"]) if function_config["parrot"]["use"] == True else None
-chat_openai_cls = chat_openai.ChatOpenai(function_config["chat_openai"]) if function_config["chat_openai"]["use"] == True else None
-live_scheduler_cls = live_scheduler.LiveScheduer(function_config["live_scheduler"],common_config["use_google_drive"],common_config["google_dirive_setting"]) if function_config["live_scheduler"]["use"] == True else None
+help_cls = help.ShowHelp()
+parrot_cls = parrot.Parrot(parrot_config) if parrot_config["use"] == True else None
+chat_openai_cls = chat_openai.ChatOpenai(chat_openai_config) if chat_openai_config["use"] == True else None
+live_scheduler_cls = live_scheduler.LiveScheduer(live_scheduler_config,common_config["use_google_drive"],common_config["google_dirive_setting"]) if live_scheduler_config["use"] == True else None
 
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]
@@ -46,10 +51,12 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 			pass
 		else:  #ここに保存コマンドを書く
 			#chatgptへの問い合わせ場合
-			if(chat_openai_cls.check_chatgpt_thread(message.channel.id) and chat_openai_cls != None):
-				await chat_openai_cls.response_chatgpt(message.channel,message.content)
-			if(live_scheduler_cls.check_schedule_editing(message.channel.id) and live_scheduler_cls != None):
-				await live_scheduler_cls.edit_schedule(message.channel,message.content)
+			if(chat_openai_cls != None and chat_openai_config["commands"]["chat"]["use"]==True):
+				if(chat_openai_cls.check_chatgpt_thread(message.channel.id)):
+					await chat_openai_cls.response_chatgpt(message.channel,message.content)
+			if(live_scheduler_cls != None and live_scheduler_config["commands"]["schedule-edit"]["use"]==True):
+				if(live_scheduler_cls.check_schedule_editing(message.channel.id)):
+					await live_scheduler_cls.edit_schedule(message.channel,message.content)
 	
 	#それ以外はコマンド実行
 	if message.author == client.user or message.author.bot:
@@ -59,6 +66,10 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 		#await message.channel.send('メッセージを受信しました。')
 	await client.process_commands(message)
 
+
+@client.command("bot-help")
+async def wrapper_help(ctx):
+	await help_cls.show_help(ctx,function_config)
 
 #オウム返し
 @client.command("parrot")
@@ -83,7 +94,7 @@ async def wrapper_chat_openai(ctx,text):
 @client.command("schedule-print")
 async def wrapper_schedule_print(ctx):
 	try:
-		if(live_scheduler_cls!=None):
+		if(live_scheduler_cls!=None and live_scheduler_config["commands"]["schedule-print"]["use"]==True):
 			await ctx.send("スケジュール画像の生成を受け付けました。\n生成までしばらくお待ちください。")
 			await live_scheduler_cls.print_schedule(ctx)
 			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
@@ -96,7 +107,7 @@ async def wrapper_schedule_print(ctx):
 @client.command("schedule-grid")
 async def wrapper_schedule_grid(ctx):
 	try:
-		if(live_scheduler_cls!=None):
+		if(live_scheduler_cls!=None and live_scheduler_config["commands"]["schedule-grid"]["use"]==True):
 			await ctx.send("グリッドを入れたscheduleのベースイメージを作成中\n生成までしばらくお待ちください。")
 			await live_scheduler_cls.print_grid_schedule_baseimg(ctx)
 			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
@@ -108,7 +119,7 @@ async def wrapper_schedule_grid(ctx):
 @client.command("schedule-show")
 async def wrapper_schedule_show(ctx):
 	try:
-		if(live_scheduler_cls!=None):
+		if(live_scheduler_cls!=None and live_scheduler_config["commands"]["schedule-show"]["use"]==True):
 			await live_scheduler_cls.show_schedule_data(ctx)
 		else:
 			await ctx.send("この機能は使用できません。")
@@ -118,7 +129,7 @@ async def wrapper_schedule_show(ctx):
 @client.command("schedule-edit")
 async def wrapper_schedule_edit(ctx):
 	try:
-		if(live_scheduler_cls!=None):
+		if(live_scheduler_cls!=None  and live_scheduler_config["commands"]["schedule-edit"]["use"]==True):
 			channel = ctx.channel
 			date = datetime.datetime.now()
 			date_str = date.strftime('%Y-%m-%d %H:%M')
