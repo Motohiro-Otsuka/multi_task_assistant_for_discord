@@ -1,4 +1,5 @@
-import datetime 
+import datetime
+from zoneinfo import ZoneInfo
 import discord
 from discord.ext import commands
 import os
@@ -93,11 +94,11 @@ class ChatOpenai:
         """
         channel = ctx.channel #メッセージがあったチャンネルの取得
         #スレッド名の定義
-        date = datetime.datetime.now()
-        date_str = date.strftime('%Y-%m-%d')
+        date = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
+        date_str = date.strftime('%Y-%m-%d %H:%M')
         thread_name = '{}'.format(date_str)
         #スレッドの作成
-        thread = await channel.create_thread(name=thread_name,reason="make chat",type=discord.ChannelType.public_thread)#スレッドを作る
+        thread = await channel.create_thread(name=thread_name,reason="make chat",type=discord.ChannelType.public_thread,auto_archive_duration=60)#スレッドを作る
         # メッセージを送信してスレッドを開始します。
         #await thread.send("/chat\n入力："+text+"\n解答作成中です\n")
         await self.response_chatgpt(thread,text)

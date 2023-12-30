@@ -13,7 +13,7 @@ class Parrot():
 		date_str = date.strftime('%Y-%m-%d')
 		thread_name = '{}'.format(date_str)
 		#スレッドの作成
-		thread = await channel.create_thread(name=thread_name,reason="クリップ録画API",type=discord.ChannelType.public_thread)#スレッドを作る
+		thread = await channel.create_thread(name=thread_name,reason="クリップ録画API",type=discord.ChannelType.public_thread,auto_archive_duration=60)#スレッドを作る
 		#録画用のために作ったスレッド以外は許容しない
 		#allow_recoed_thread_id.append(thread.id)
 		#移動先のディレクトリ名はスレッドidで管理する
