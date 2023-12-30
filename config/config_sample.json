@@ -8,11 +8,21 @@
     "function":{
         "parrot":{
             "use":true,
-            "discription":"オウム返しする"
-            },
+            "commands":{
+                "parrot":{
+                    "discription":"スレッドを立ててオウム返しする",
+                    "use":true
+                }
+            }
+        },
         "chat_openai":{
             "use":true,
-            "discription":"chatGPTを使ってチャットボットの応答をする",
+            "commands":{
+                "chat":{
+                    "discription":"chatGPTを使ってチャットボットの応答をする",
+                    "use":true
+                }
+            },
             "OPENAI_API_KEY":"Enter your openai api key",
             "model":"gpt-3.5-turbo-1106",
             "system_prompt":"あなたは親切なアシスタントです。",
@@ -23,7 +33,24 @@
         "live_scheduler":{
             "use":true,
             "googleDrive":true,
-            "discription":"chatGPTを使ってチャットボットの応答をする",
+            "commands":{
+                "schedule-print":{
+                    "discription":"スケジュール画像を生成する",
+                    "use":true
+                },
+                "schedule-grid":{
+                    "discription":"スケジュール画像にグリッド線を入れた画像を生成する。主にデバッグ用",
+                    "use":true
+                },
+                "schedule-show":{
+                    "discription":"現在登録されているスケジュールを表示する",
+                    "use":true
+                },
+                "schedule-edit":{
+                    "discription":"現在登録されているスケジュールを変更する",
+                    "use":true
+                }
+            },
             "files":{
                 "icons":{
                     "name":"googleDrive共有リンク or local file path"
