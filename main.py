@@ -81,7 +81,7 @@ async def wrapper_chat_openai(ctx,text):
 
 #スケジュール画像の表示
 @client.command("schedule-print")
-async def wrapper_chat_openai(ctx):
+async def wrapper_schedule_print(ctx):
 	try:
 		if(live_scheduler_cls!=None):
 			await ctx.send("スケジュール画像の生成を受け付けました。\n生成までしばらくお待ちください。")
@@ -94,7 +94,7 @@ async def wrapper_chat_openai(ctx):
 
 #スケジュール画像にグリッドを表示
 @client.command("schedule-grid")
-async def wrapper_chat_openai(ctx):
+async def wrapper_schedule_grid(ctx):
 	try:
 		if(live_scheduler_cls!=None):
 			await ctx.send("グリッドを入れたscheduleのベースイメージを作成中\n生成までしばらくお待ちください。")
@@ -106,7 +106,7 @@ async def wrapper_chat_openai(ctx):
 		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
 @client.command("schedule-show")
-async def wrapper_chat_openai(ctx):
+async def wrapper_schedule_show(ctx):
 	try:
 		if(live_scheduler_cls!=None):
 			await live_scheduler_cls.show_schedule_data(ctx)
@@ -116,7 +116,7 @@ async def wrapper_chat_openai(ctx):
 		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
 @client.command("schedule-edit")
-async def wrapper_chat_openai(ctx):
+async def wrapper_schedule_edit(ctx):
 	try:
 		if(live_scheduler_cls!=None):
 			channel = ctx.channel
@@ -126,6 +126,7 @@ async def wrapper_chat_openai(ctx):
 			#スレッドの作成
 			thread = await channel.create_thread(name=thread_name,reason="スケジュール編集",type=discord.ChannelType.public_thread)#スレッドを作る
 			await live_scheduler_cls.edit_schedule(thread)
+			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
 		else:
 			await ctx.send("この機能は使用できません。")
 	except Exception as e:

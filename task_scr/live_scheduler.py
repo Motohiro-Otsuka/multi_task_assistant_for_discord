@@ -86,7 +86,7 @@ class LiveScheduer:
                                         (column_point["x"]+size["x"]*(j)+c_x,column_point["y"]+size["y"]*i+c_y),
                                         number_img)
                         j += 1    
-                elif (column_key == "time"):
+                elif (column_key == "time" and val["開始時間"] is not None):
                     start_time = val["開始時間"].strftime("%H:%M")
                     j = 0
                     for d in start_time:
@@ -98,7 +98,7 @@ class LiveScheduer:
                                         (column_point["x"]+size["x"]*(j)+c_x,column_point["y"]+size["y"]*i+c_y),
                                         number_img)
                         j += 1
-                elif(column_key == "content"):
+                elif(column_key == "content" and val["内容"] is not None):
                     c_x,c_y = self.centering(contents_images[val["内容"]],column_key)
                     base_image.paste(contents_images[val["内容"]] ,
                                     (column_point["x"]+c_x,column_point["y"]+size["y"]*i+c_y),
@@ -112,7 +112,7 @@ class LiveScheduer:
                                             (column_point["x"]+size["x"]*(j)+c_x,column_point["y"]+size["y"]*i+c_y),
                                             liver_images[liver_name])
                         j += 1
-                elif(column_key == "platform"):
+                elif(column_key == "platform" and val["サイト"] is not None):
                     c_x,c_y = self.centering(platform_images[val["サイト"]],column_key)
                     base_image.paste(platform_images[val["サイト"]] ,
                                     (column_point["x"]+c_x,column_point["y"]+size["y"]*i+c_y))
@@ -191,11 +191,20 @@ class LiveScheduer:
             if(column=="liver"):
                 response += "  - liver\n" 
                 for name,assign in val.items():
-                    response += "    - {}:{}\n".format(name,assign)
+                    if(assign is None):
+                        response += "    - {}:{}\n".format(name,"x")
+                    else:
+                        response += "    - {}:{}\n".format(name,assign)
             elif(column=="開始時間" or column=="終了時間"):
-                response += "  - {}:{}\n".format(column,val.strftime("%H:%M")) 
+                if(val is not None):
+                    response += "  - {}:{}\n".format(column,val.strftime("%H:%M")) 
+                else:
+                    response += "  - {}:{}\n".format(column,"")
             else:
-                response += "  - {}:{}\n".format(column,val)
+                if(val is not None):
+                    response += "  - {}:{}\n".format(column,val)
+                else:
+                    response += "  - {}:{}\n".format(column,"")
         return response
         
     def schedule_all_json_to_markdown(self,schedule=None):
@@ -257,15 +266,15 @@ class LiveScheduer:
                 i += 1
             #スケジュールの取得
             for i in range(7):
-                date = ws.cell(3+i, 2)
-                schedule[str(date.value)] = {"liver":{}}
+                date = str(int(ws.cell(3+i, 2).value))
+                schedule[date] = {"liver":{}}
                 #配信情報を取得
                 for j in range(len(label)):
                     content = ws.cell(3+i, label_start_idx+j)
-                    schedule[str(date.value)][label[j]] = content.value
+                    schedule[date][label[j]] = content.value
                 for j in range(len(liver)):
                     liver_state = ws.cell(3+i, liver_start_idx+j)
-                    schedule[str(date.value)]["liver"][liver[j]] = liver_state.value
+                    schedule[date]["liver"][liver[j]] = liver_state.value
             wb.close()
             return schedule
         schedule = {}
@@ -313,12 +322,12 @@ class LiveScheduer:
         if(self.use_drive):
             excel_file_id = self.schedule.split("/")[5]
             excle_wb = self.drive.CreateFile({'id': excel_file_id})
-            with tempfile.TemporaryDirectory() as temp_dir:
-                excel_file_path = '{}/schedule.xlsx'.format(temp_dir)
-                excle_wb.GetContentFile(excel_file_path)
-                edit_excel_schedule(excel_file_path)
-                excle_wb.SetContentFile(excel_file_path)
-                await excle_wb.Upload()
+            os.makedirs(self.tmp_dir_path, exist_ok=True)
+            excel_file_path = os.path.join(self.tmp_dir_path,"schedule.xlsx")
+            excle_wb.GetContentFile(excel_file_path)
+            edit_excel_schedule(excel_file_path)
+            excle_wb.SetContentFile(excel_file_path)
+            excle_wb.Upload()
         else:
             excel_file_path = self.schedule
             edit_excel_schedule(excel_file_path)
@@ -340,13 +349,12 @@ class LiveScheduer:
                 self.editing_dic[thread.id]["schedule"][day] = new_schedule
                 await thread.send(self.schedule_all_json_to_markdown(self.editing_dic[thread.id]["schedule"]))
                 await thread.send("変更後は上記のようになりました。")
-                self.save_new_schedule(thread.id)
+                await self.save_new_schedule(thread.id)
                 await thread.send("別の日程を変更する場合はもう一度schedule-editコマンドを叩いてください")
             #入力されたmarkdownを処理してスケジュールを更新する
             #先にスケジュールを作るコードを実装する
         else:#初めての場合は1週間のスケジュールを返す
             schedule_obj = self.get_schedule()
-            print(schedule_obj)
             self.editing_dic[thread.id] = {"schedule":schedule_obj,"status":"choice","editing_day":None,"timestamp":datetime.datetime.now()}
             await thread.send(self.schedule_all_json_to_markdown())
             await thread.send("変更したい日の日付を数字で答えてください")
