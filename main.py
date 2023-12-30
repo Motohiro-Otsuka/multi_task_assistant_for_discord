@@ -24,6 +24,8 @@ live_scheduler_cls = live_scheduler.LiveScheduer(live_scheduler_config,common_co
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]
 
+
+
 #replitを使用する場合に必要なライブラリを読み込み
 if(common_config["use_replit"]):
 	from server import keep_alive# ToDo ない場合は読み込まない
@@ -54,6 +56,8 @@ async def on_message(message):  #メッセージをなにかしら受け取っ�
 			if(chat_openai_cls != None and chat_openai_config["commands"]["chat"]["use"]==True):
 				if(chat_openai_cls.check_chatgpt_thread(message.channel.id)):
 					await chat_openai_cls.response_chatgpt(message.channel,message.content)
+				#暫定処置：時間切れになったスレッドのログを削除する
+				chat_openai_cls.delete_chat_log()
 			if(live_scheduler_cls != None and live_scheduler_config["commands"]["schedule-edit"]["use"]==True):
 				if(live_scheduler_cls.check_schedule_editing(message.channel.id)):
 					await live_scheduler_cls.edit_schedule(message.channel,message.content)
@@ -84,6 +88,7 @@ async def wrapper_parrot(ctx,text):
 async def wrapper_chat_openai(ctx,text):
 	try:
 		if(chat_openai_cls!=None):
+			chat_openai_cls.delete_chat_log()
 			await chat_openai_cls.new_chat(ctx,text)
 		else:
 			await ctx.send("この機能は使用できません。")

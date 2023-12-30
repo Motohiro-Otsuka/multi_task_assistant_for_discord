@@ -5,7 +5,9 @@ from discord.ext import commands
 import os
 import openai
 import json
-
+from threading import Thread
+import time 
+import pytz
 
 class ChatOpenai:
 
@@ -16,14 +18,14 @@ class ChatOpenai:
         openai.api_key = config["OPENAI_API_KEY"]
         self.log_num = config["max_log"]
         self.message_dic = {}
-        """
-        messages = [
-            {"role": "system", "content": "あなたは親切なアシスタントです。"},
-            {"role": "user", "content": "春の季語を絡めた冗談を教えてください。"},
-            {"role": "assistant", "content": "「春眠（しゅんみん）暁（ぎょう）を覚（さ）えず」という言葉がありますが、「春は眠くても、アシスタントは覚えてるよ！」と言って、ツッコミを入れるのはいかがでしょうか？笑"},
-            {"role": "user", "content": "面白くない。もう一度。"},
-        ]
-        """
+
+    def delete_chat_log(self):
+        for thread_id in  self.message_dic.keys():
+            create_time = datetime.datetime.strptime(self.message_dic[thread_id]["start_time"], "%Y-%m-%d %H:%M").replace(tzinfo=pytz.timezone('Asia/Tokyo'))
+            now_time = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
+            delta = now_time - create_time
+            if(delta.days >= 1):
+                del message_dic[thread_id]
 
     def add_assistant_chat_log(self,thread_id,text):
         """
@@ -54,7 +56,7 @@ class ChatOpenai:
             self.message_dic[thread_id] = {}
             self.message_dic[thread_id]["prompt"] = prompt
             date = datetime.datetime.now()
-            self.message_dic[thread_id]["start_time"] = date.strftime('%Y-%m-%d')
+            self.message_dic[thread_id]["start_time"] = date.strftime('%Y-%m-%d %H:%M')
         else:
             self.message_dic[thread_id]["prompt"].append({"role": "user", "content": text})
         #上限を超えたときの処理を入れる

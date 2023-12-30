@@ -352,6 +352,7 @@ class LiveScheduer:
                 await thread.send("変更後は上記のようになりました。")
                 await self.save_new_schedule(thread.id)
                 await thread.send("別の日程を変更する場合はもう一度schedule-editコマンドを叩いてください")
+                del self.editing_dic[thread.id]
             #入力されたmarkdownを処理してスケジュールを更新する
             #先にスケジュールを作るコードを実装する
         else:#初めての場合は1週間のスケジュールを返す
