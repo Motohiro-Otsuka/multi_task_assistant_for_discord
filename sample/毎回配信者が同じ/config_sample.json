@@ -1,8 +1,8 @@
 {
     "common":{
-        "discord_api_key":"Enter your discord api key",
-        "use_replit":true,
-        "use_google_drive": true,
+        "discord_api_key":"Enter your discord_api_key",
+        "use_replit":false,
+        "use_google_drive": false,
         "google_dirive_setting":"./config/google_drive_settings.yaml"
         },
     "function":{
@@ -23,12 +23,12 @@
                     "use":true
                 }
             },
-            "OPENAI_API_KEY":"Enter your openai api key",
+            "OPENAI_API_KEY":"Enter your OPENAI_API_KEY",
             "model":"gpt-3.5-turbo-1106",
             "system_prompt":"あなたは親切なアシスタントです。",
-            "max_tokens":"200",
-            "temperature":"0.7",
-            "max_log":"5"
+            "max_tokens":200,
+            "temperature":0.7,
+            "max_log":5
             },
         "live_scheduler":{
             "use":true,
@@ -53,33 +53,31 @@
             },
             "files":{
                 "icons":{
-                    "name":"googleDrive共有リンク or local file path"
                 },
                 "contents":{
-                    "スプラ":"googleDrive 共有リンクor local file path",
-                    "雑談":"googleDrive 共有リンクor local file path"
+                    "スプラ":"googleDrive共有リンク or local file path",
+                    "雑談":"googleDrive共有リンク or local file path"
                 },
                 "platform":{
-                    "YouTube":"googleDrive 共有リンクor local file path",
-                    "ミラティブ":"googleDrive 共有リンクor local file path",
-                    "ツイキャス":"googleDrive 共有リンクor local file path",
-                    "ニコ生":"googleDrive 共有リンクor local file path"
+                    "YouTube":"googleDrive共有リンク or local file path",
+                    "ツイキャス":"googleDrive共有リンク or local file path",
+                    "ニコ生":"googleDrive共有リンク or local file path"
                 },
                 "number_img":{
-                    "0":"googleDrive 共有リンクor local file path",
-                    "1":"googleDrive 共有リンクor local file path",
-                    "2":"googleDrive 共有リンクor local file path",
-                    "3":"googleDrive 共有リンクor local file path",
-                    "4":"googleDrive 共有リンクor local file path",
-                    "5":"googleDrive 共有リンクor local file path",
-                    "6":"googleDrive 共有リンクor local file path",
-                    "7":"googleDrive 共有リンクor local file path",
-                    "8":"googleDrive 共有リンクor local file path",
-                    "9":"googleDrive 共有リンクor local file path",
-                    ":":"googleDrive 共有リンクor local file path"
+                    "0":"googleDrive共有リンク or local file path",
+                    "1":"googleDrive共有リンク or local file path",
+                    "2":"googleDrive共有リンク or local file path",
+                    "3":"googleDrive共有リンク or local file path",
+                    "4":"googleDrive共有リンク or local file path",
+                    "5":"googleDrive共有リンク or local file path",
+                    "6":"googleDrive共有リンク or local file path",
+                    "7":"googleDrive共有リンク or local file path",
+                    "8":"googleDrive共有リンク or local file path",
+                    "9":"googleDrive共有リンク or local file path",
+                    ":":"googleDrive共有リンク or local file path"
                 },
-                "format":"googleDrive 共有リンクor local file path",
-                "schedule":"googleDrive 共有リンクor local file path",
+                "format":"googleDrive共有リンク or local file path",
+                "schedule":"googleDrive共有リンク or local file path",
                 "tmp_dir_path":"tmp"
             },
             "grid":{
@@ -93,7 +91,7 @@
                         "y":70
                     },
                     "content":{
-                        "x":340,
+                        "x":652,
                         "y":70
                     },
                     "liver":{
