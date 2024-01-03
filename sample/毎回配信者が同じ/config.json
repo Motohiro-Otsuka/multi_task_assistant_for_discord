@@ -19,7 +19,7 @@
             "use":true,
             "commands":{
                 "chat":{
-                    "discription":"chatGPTを使ってチャットボットの応答をする",
+                    "discription":"chatGPTを使ってチャットボットの応答をする\n/chat GPTに問い合わせる文章\nを入力して使う",
                     "use":true
                 }
             },
@@ -55,29 +55,30 @@
                 "icons":{
                 },
                 "contents":{
-                    "スプラ":"googleDrive共有リンク or local file path",
-                    "雑談":"googleDrive共有リンク or local file path"
+                    "スプラ":"./sample/images/配信内容/スプラ.png",
+                    "雑談":"./sample/images/配信内容/雑談.png",
+                    "お休み":"./sample/images/配信内容/お休み.png"
                 },
                 "platform":{
-                    "YouTube":"googleDrive共有リンク or local file path",
-                    "ツイキャス":"googleDrive共有リンク or local file path",
-                    "ニコ生":"googleDrive共有リンク or local file path"
+                    "YouTube":"./sample/images/配信サイト/YouTube.png",
+                    "ツイキャス":"./sample/images/配信サイト/ツイキャス.png",
+                    "ニコ生":"./sample/images/配信サイト/ニコ生.png"
                 },
                 "number_img":{
-                    "0":"googleDrive共有リンク or local file path",
-                    "1":"googleDrive共有リンク or local file path",
-                    "2":"googleDrive共有リンク or local file path",
-                    "3":"googleDrive共有リンク or local file path",
-                    "4":"googleDrive共有リンク or local file path",
-                    "5":"googleDrive共有リンク or local file path",
-                    "6":"googleDrive共有リンク or local file path",
-                    "7":"googleDrive共有リンク or local file path",
-                    "8":"googleDrive共有リンク or local file path",
-                    "9":"googleDrive共有リンク or local file path",
-                    ":":"googleDrive共有リンク or local file path"
+                    "0":"./sample/images/数字/0.png",
+                    "1":"./sample/images/数字/1.png",
+                    "2":"./sample/images/数字/2.png",
+                    "3":"./sample/images/数字/3.png",
+                    "4":"./sample/images/数字/4.png",
+                    "5":"./sample/images/数字/5.png",
+                    "6":"./sample/images/数字/6.png",
+                    "7":"./sample/images/数字/7.png",
+                    "8":"./sample/images/数字/8.png",
+                    "9":"./sample/images/数字/9.png",
+                    ":":"./sample/images/数字/コロン.png"
                 },
-                "format":"googleDrive共有リンク or local file path",
-                "schedule":"googleDrive共有リンク or local file path",
+                "format":"./sample/毎回配信者が同じ/スケジュールひな形_sample1.png",
+                "schedule":"./sample/毎回配信者が同じ/スケジュール表.xlsx",
                 "tmp_dir_path":"tmp"
             },
             "grid":{

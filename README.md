@@ -5,7 +5,7 @@
 
 また、本READMEは、pythonを使ったことがある人、もしくはプログラミングの経験を有している人向けに記載しており、完全な初心者に対して配慮しきれていない部分があると思いますがご了承ください。
 
-ご利用に際しては、免責事項、ライセンスを一読してからご使用ください。
+ご利用に際しては、免責事項、ライセンスを一読してからご使用ください。  
 リリースノートは、ReleaseNote.mdをご覧ください。
 
 # 機能一覧
@@ -39,16 +39,20 @@
 9.  (google) 5で作った `client_secrets.json`はconfig配下に配置する
 10. `python main.py`でボットを起動する。  
    (google)google driveを使用する場合は初めの１回だけ認証を求められる。その後は、認証情報が `config/saved_credentials.json`に格納される
+11. discordで`/bot-help`と入力し、使い方と説明が表示されることを確認する。
 
 ## ※1 config.jsonのパラメータ説明
 - common要素：botの共通の設定。
+  - discord_api_key:  discord botのAPIキーを入力する
   - use_replit: [replit](https://replit.com)を使用する場合、trueにする。また使用する場合は、keepaliveのために冗長構成を持つようにreplitのプロジェクトを立てる必要がある。[参考](https://qiita.com/eureyuri/items/c5f041773c93a54b9f92)
   - use_google_drive: googleドライブからファイルを取得する場合は、trueにする。ローカルのファイルから読み取って使用するにはfalseを入力。
+  - google_dirive_setting: googleドライブを使う場合の設定ファイルが格納されている（使わない場合はそのままでもよい）
 - function: 機能の定義などの設定。
   - use: 機能群を使用をする場合はture, 使用しない場合はfalse
-  - commands: discord bot で使うコマンド。変更しないでください。
+  - commands: discord bot で使うコマンド。コマンド名は変更しないでください。
     - discription: `/bot-help`コマンドで表示する内容
     - use: このコマンドを使用をする場合はture, 使用しない場合はfalse
+
 それ以外の、各機能に依存するパラメータの説明は `doc/`配下に格納しているドキュメントをご覧ください
 
 # 免責事項
