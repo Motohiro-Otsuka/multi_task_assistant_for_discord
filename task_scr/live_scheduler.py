@@ -9,7 +9,6 @@ import openai
 import json
 from PIL import Image, ImageFilter,  ImageDraw
 import shutil
-#from openpyxl import Workbook
 import openpyxl
 
 
@@ -22,9 +21,15 @@ class LiveScheduer:
     def __init__(self,config,use_drive,gdrive_setting_path=""):
         self.use_drive = use_drive
         if(self.use_drive):
-            gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
-            gauth.LocalWebserverAuth()
-            self.drive = GoogleDrive(gauth)
+            try:
+                gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
+                gauth.LocalWebserverAuth()
+                self.drive = GoogleDrive(gauth)
+            except:
+                os.remove('config/saved_credentials.json')
+                gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
+                gauth.LocalWebserverAuth()
+                self.drive = GoogleDrive(gauth)
         else:
             pass
         self.config = config
@@ -118,7 +123,6 @@ class LiveScheduer:
                     base_image.paste(platform_images[val["サイト"]] ,
                                     (column_point["x"]+c_x,column_point["y"]+size["y"]*i+c_y))
             i += 1
-
         await self.return_schedule_picture(base_image,ctx)
 
     async def print_grid_schedule_baseimg(self,ctx=None):
@@ -153,12 +157,14 @@ class LiveScheduer:
             img.GetContentFile(img_path)
         else:
             img_path = img_id
-        image_obj = Image.open(img_path)
+        image_obj = Image.open(img_path).convert('RGBA')
         return image_obj
 
     def get_schedule_base_image(self):
-        return self.get_image(self.config["files"]["format"].split("/")[5])
-    
+        if(self.use_drive):
+            return self.get_image(self.config["files"]["format"].split("/")[5])
+        else:
+            return self.get_image(self.config["files"]["format"])
     def get_icons(self,icon_paths,grid_name):
         icon_objects = {}
         for key,val in icon_paths.items():
