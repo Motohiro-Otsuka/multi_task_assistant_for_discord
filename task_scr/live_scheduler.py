@@ -9,7 +9,6 @@ import openai
 import json
 from PIL import Image, ImageFilter,  ImageDraw
 import shutil
-#from openpyxl import Workbook
 import openpyxl
 
 
@@ -22,9 +21,15 @@ class LiveScheduer:
     def __init__(self,config,use_drive,gdrive_setting_path=""):
         self.use_drive = use_drive
         if(self.use_drive):
-            gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
-            gauth.LocalWebserverAuth()
-            self.drive = GoogleDrive(gauth)
+            try:
+                gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
+                gauth.LocalWebserverAuth()
+                self.drive = GoogleDrive(gauth)
+            except:
+                os.remove('config/saved_credentials.json')
+                gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
+                gauth.LocalWebserverAuth()
+                self.drive = GoogleDrive(gauth)
         else:
             pass
         self.config = config

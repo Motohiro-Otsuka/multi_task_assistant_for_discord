@@ -8,5 +8,5 @@ class ShowHelp:
             if (item["use"]):
                 for func,conf in  item["commands"].items():
                     if(conf["use"]):
-                        response += "- コマンド: {}\n  - 説明: {}\n".format(func,conf["discription"])
+                        response += "- コマンド: /{}\n  - 説明: {}\n".format(func,conf["discription"])
         await ctx.send(response)
