@@ -19,7 +19,7 @@
 - 今後も追加予定
 
 # 使い方
-各機能の詳細は`doc/`をご確認ください。  
+各機能の詳細はdocsディレクトリをご確認ください。  
 以下の説明に（google）と書かれている項目は、googleドライブにあるファイルを使用したい場合のみ行う。
 1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
 2. [python](https://www.python.org/downloads/)をinstallする。
