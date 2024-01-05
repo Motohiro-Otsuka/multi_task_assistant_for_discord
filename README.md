@@ -20,7 +20,8 @@
 
 # 使い方
 各機能の詳細はdocsディレクトリをご確認ください。  
-以下の説明に（google）と書かれている項目は、googleドライブにあるファイルを使用したい場合のみ行う。
+以下の説明に（google）と書かれている項目は、googleドライブにあるファイルを、google driveのアプリと連携せずに使用したい場合のみ行う。  
+アプリと連携している場合は、どこかのドライブにマウントされているので、あえて使用する必要はない。
 1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
 2. [python](https://www.python.org/downloads/)をinstallする。
 3. pipコマンドをinstallする。

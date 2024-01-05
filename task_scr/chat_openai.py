@@ -6,49 +6,53 @@ import os
 import openai
 import json
 from threading import Thread
-import time 
+import time
 import pytz
 
-class ChatOpenai:
 
-    def __init__(self,config):
+class ChatOpenai:
+    def __init__(self, config):
         self.config = config
-        #openai_conf_obj = open("./config/openai_conf.json","r")
-        #openai_config = json.load(openai_conf_obj)
+        # openai_conf_obj = open("./config/openai_conf.json","r")
+        # openai_config = json.load(openai_conf_obj)
         openai.api_key = config["OPENAI_API_KEY"]
         self.log_num = config["max_log"]
         self.message_dic = {}
 
     def delete_chat_log(self):
-        for thread_id in  self.message_dic.keys():
-            create_time = datetime.datetime.strptime(self.message_dic[thread_id]["start_time"], "%Y-%m-%d %H:%M").replace(tzinfo=pytz.timezone('Asia/Tokyo'))
+        for thread_id in self.message_dic.keys():
+            create_time = datetime.datetime.strptime(
+                self.message_dic[thread_id]["start_time"], "%Y-%m-%d %H:%M"
+            ).replace(tzinfo=pytz.timezone("Asia/Tokyo"))
             now_time = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
             delta = now_time - create_time
-            if(delta.days >= 1):
+            if delta.days >= 1:
                 del message_dic[thread_id]
 
-    def add_assistant_chat_log(self,thread_id,text):
+    def add_assistant_chat_log(self, thread_id, text):
         """
         chatログを追加するための関数
         """
-        self.message_dic[thread_id]["prompt"].append({"role": "assistant", "content": text})
+        self.message_dic[thread_id]["prompt"].append(
+            {"role": "assistant", "content": text}
+        )
 
-    def check_chatgpt_thread(self,thread_id):
+    def check_chatgpt_thread(self, thread_id):
         """
         すでにchatのスレッドが立っているか確認するための
         """
-        if (thread_id in self.message_dic):
+        if thread_id in self.message_dic:
             return True
         else:
             return False
 
-    async def make_prompt(self,thread_id,text):
+    async def make_prompt(self, thread_id, text):
         """
         chat-gptに問い合わせるためのpromptを作る関数
         """
-        #threadに１投稿目の時
+        # threadに１投稿目の時
         prompt = None
-        if (thread_id not in self.message_dic):
+        if thread_id not in self.message_dic:
             prompt = [
                 {"role": "system", "content": self.config["system_prompt"]},
                 {"role": "user", "content": text},
@@ -56,15 +60,17 @@ class ChatOpenai:
             self.message_dic[thread_id] = {}
             self.message_dic[thread_id]["prompt"] = prompt
             date = datetime.datetime.now()
-            self.message_dic[thread_id]["start_time"] = date.strftime('%Y-%m-%d %H:%M')
+            self.message_dic[thread_id]["start_time"] = date.strftime("%Y-%m-%d %H:%M")
         else:
-            self.message_dic[thread_id]["prompt"].append({"role": "user", "content": text})
-        #上限を超えたときの処理を入れる
-        while(len(self.message_dic[thread_id]) >= int(self.log_num) + 1):
+            self.message_dic[thread_id]["prompt"].append(
+                {"role": "user", "content": text}
+            )
+        # 上限を超えたときの処理を入れる
+        while len(self.message_dic[thread_id]) >= int(self.log_num) + 1:
             del self.message_dic[thread_id]["prompt"][1]
         return self.message_dic[thread_id]["prompt"]
 
-    async def call_openai(self,messages):
+    async def call_openai(self, messages):
         """
         chat gptに問い合わせるための関数
         """
@@ -80,27 +86,32 @@ class ChatOpenai:
         )
         return response.choices[0].message.content.strip()
 
-    async def response_chatgpt(self,thread,text):
+    async def response_chatgpt(self, thread, text):
         """
         discordにchat-gptのレスポンスを返すための関数
         """
-        prompt = await self.make_prompt(thread.id,text)
+        prompt = await self.make_prompt(thread.id, text)
         response = await self.call_openai(prompt)
-        #ログを追加
-        self.add_assistant_chat_log(thread.id,response)
+        # ログを追加
+        self.add_assistant_chat_log(thread.id, response)
         await thread.send(response)
 
-    async def new_chat(self,ctx,text):
+    async def new_chat(self, ctx, text):
         """
         /chatコマンドが呼ばれた時の処理。新たにスレッドを立てて、chat-gptのレスポンスを返す関数
         """
-        channel = ctx.channel #メッセージがあったチャンネルの取得
-        #スレッド名の定義
+        channel = ctx.channel  # メッセージがあったチャンネルの取得
+        # スレッド名の定義
         date = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
-        date_str = date.strftime('%Y-%m-%d %H:%M')
-        thread_name = '{}'.format(date_str)
-        #スレッドの作成
-        thread = await channel.create_thread(name=thread_name,reason="make chat",type=discord.ChannelType.public_thread,auto_archive_duration=60)#スレッドを作る
+        date_str = date.strftime("%Y-%m-%d %H:%M")
+        thread_name = "{}".format(date_str)
+        # スレッドの作成
+        thread = await channel.create_thread(
+            name=thread_name,
+            reason="make chat",
+            type=discord.ChannelType.public_thread,
+            auto_archive_duration=60,
+        )  # スレッドを作る
         # メッセージを送信してスレッドを開始します。
-        #await thread.send("/chat\n入力："+text+"\n解答作成中です\n")
-        await self.response_chatgpt(thread,text)
+        # await thread.send("/chat\n入力："+text+"\n解答作成中です\n")
+        await self.response_chatgpt(thread, text)
