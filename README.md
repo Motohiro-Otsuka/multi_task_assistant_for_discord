@@ -35,8 +35,8 @@
      - 以降は、zipファイルを展開したフォルダ or ディレクトリで作業をする
 6. `pip install -r requirements.txt`必用なライブラリをinstallする。
 7. `./config/config_sample.json` を `./config/config.json`にコピーしてconfigファイルを作る※1
-8. (google) [googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「デスクトップアプリケーションの認証情報を承認する」までを行う。
-9.  (google) 5で作った `client_secrets.json`はconfig配下に配置する
+8. (google) [googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「デスクトップアプリケーションの認証情報を承認する」までを行う。※2
+9.  (google) 8で作った `client_secrets.json`はconfig配下に配置する
 10. `python main.py`でボットを起動する。  
    (google)google driveを使用する場合は初めの１回だけ認証を求められる。その後は、認証情報が `config/saved_credentials.json`に格納される
 11. discordで`/bot-help`と入力し、使い方と説明が表示されることを確認する。
@@ -54,6 +54,13 @@
     - use: このコマンドを使用をする場合はture, 使用しない場合はfalse
 
 それ以外の、各機能に依存するパラメータの説明は `doc/`配下に格納しているドキュメントをご覧ください
+
+## ※2 google service accountを使用する場合
+手順8,9の代わりに下記を実施する。
+1. GCPにアクセスして、サービスアカウントを発行する。
+2. サービスアカウントに対してsecretキーを発行する。
+3. 発行したsecretキーを./config/secret_key.jsonという名前で保存する
+4. config/config.jsonの`use_google_service_account`をtrueにする
 
 # 免責事項
 本スクリプトは個人的な開発で作成されたものです。  

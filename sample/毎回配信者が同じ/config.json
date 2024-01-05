@@ -3,6 +3,7 @@
         "discord_api_key":"Enter your discord_api_key",
         "use_replit":false,
         "use_google_drive": false,
+        "use_google_service_account": false,
         "google_dirive_setting":"./config/google_drive_settings.yaml"
         },
     "function":{

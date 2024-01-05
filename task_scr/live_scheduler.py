@@ -18,16 +18,28 @@ from pydrive2.drive import GoogleDrive
 import time
 
 class LiveScheduer:
-    def __init__(self,config,use_drive,gdrive_setting_path=""):
+    def __init__(self,config,use_drive,use_service_account,gdrive_setting_path=""):
         self.use_drive = use_drive
         if(self.use_drive):
             try:
-                gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
-                gauth.LocalWebserverAuth()
-                self.drive = GoogleDrive(gauth)
+                if(use_service_account):
+                    print("google login")
+                    settings = {
+                        "client_config_backend": "service",
+                        "service_config": {
+                        "client_json_file_path": "./config/secret_key.json",
+                        }
+                    }
+                    gauth = GoogleAuth(settings=settings)
+                    gauth.ServiceAuth()
+                    self.drive = GoogleDrive(gauth)
+                else:
+                    gauth = GoogleAuth(gdrive_setting_path) 
+                    gauth.LocalWebserverAuth()
+                    self.drive = GoogleDrive(gauth)
             except:
                 os.remove('config/saved_credentials.json')
-                gauth = GoogleAuth(gdrive_setting_path) #if gdrive_setting_path != "" else GoogleAuth()
+                gauth = GoogleAuth(gdrive_setting_path)
                 gauth.LocalWebserverAuth()
                 self.drive = GoogleDrive(gauth)
         else:
