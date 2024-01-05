@@ -19,7 +19,7 @@ live_scheduler_config = function_config["live_scheduler"]
 help_cls = help.ShowHelp()
 parrot_cls = parrot.Parrot(parrot_config) if parrot_config["use"] == True else None
 chat_openai_cls = chat_openai.ChatOpenai(chat_openai_config) if chat_openai_config["use"] == True else None
-live_scheduler_cls = live_scheduler.LiveScheduer(live_scheduler_config,common_config["use_google_drive"],common_config["google_dirive_setting"]) if live_scheduler_config["use"] == True else None
+live_scheduler_cls = live_scheduler.LiveScheduer(live_scheduler_config,common_config["use_google_drive"],common_config["use_google_service_account"],common_config["google_dirive_setting"]) if live_scheduler_config["use"] == True else None
 
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]

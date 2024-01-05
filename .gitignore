@@ -1,6 +1,7 @@
 config/config.json
 config/client_secrets.json
 config/saved_credentials.json
+config/secret_key.json
 .replit
 poetry.lock
 pyproject.toml
