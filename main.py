@@ -2,13 +2,13 @@ import discord
 from discord.ext import commands
 import json
 import shutil
-import datetime 
-from task_scr import help,parrot,chat_openai,live_scheduler
+import datetime
+from task_scr import help, parrot, chat_openai, live_scheduler
 
-#configの読み込み
-config_file = open("./config/config.json","r",encoding="utf-8")
+# configの読み込み
+config_file = open("./config/config.json", "r", encoding="utf-8")
 config = json.load(config_file)
-common_config= config["common"]
+common_config = config["common"]
 function_config = config["function"]
 
 parrot_config = function_config["parrot"]
@@ -18,19 +18,31 @@ live_scheduler_config = function_config["live_scheduler"]
 ## 各機能ごとのconfig取り出し
 help_cls = help.ShowHelp()
 parrot_cls = parrot.Parrot(parrot_config) if parrot_config["use"] == True else None
-chat_openai_cls = chat_openai.ChatOpenai(chat_openai_config) if chat_openai_config["use"] == True else None
-live_scheduler_cls = live_scheduler.LiveScheduer(live_scheduler_config,common_config["use_google_drive"],common_config["use_google_service_account"],common_config["google_dirive_setting"]) if live_scheduler_config["use"] == True else None
+chat_openai_cls = (
+    chat_openai.ChatOpenai(chat_openai_config)
+    if chat_openai_config["use"] == True
+    else None
+)
+live_scheduler_cls = (
+    live_scheduler.LiveScheduer(
+        live_scheduler_config,
+        common_config["use_google_drive"],
+        common_config["use_google_service_account"],
+        common_config["google_dirive_setting"],
+    )
+    if live_scheduler_config["use"] == True
+    else None
+)
 
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]
 
 
+# replitを使用する場合に必要なライブラリを読み込み
+if common_config["use_replit"]:
+    from server import keep_alive  # ToDo ない場合は読み込まない
 
-#replitを使用する場合に必要なライブラリを読み込み
-if(common_config["use_replit"]):
-	from server import keep_alive# ToDo ない場合は読み込まない
-
-#discordbotの設定
+# discordbotの設定
 intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
@@ -38,122 +50,155 @@ intents.members = True
 intents.message_content = True  # メッセージに関するデバッグ情報を有効化
 client = commands.Bot(command_prefix="/", intents=intents)
 
-#bot用スクリプト
+
+# bot用スクリプト
 @client.event
 async def on_ready():
-	print('ログインしました')
+    print("ログインしました")
 
 
 @client.event
-async def on_message(message):  #メッセージをなにかしら受け取ったときの処理
-	if type(message.channel) is discord.Thread:  #スレッドでメッセージを受け取った時
-		if message.author == client.user or message.author.bot:  #メッセージの送り主がbotの時は処理しない
-			pass
-		elif False:#message.channel.id not in allow_recoed_thread_id:  #録画を許可しないスレッドは処理しない
-			pass
-		else:  #ここに保存コマンドを書く
-			#chatgptへの問い合わせ場合
-			if(chat_openai_cls != None and chat_openai_config["commands"]["chat"]["use"]==True):
-				if(chat_openai_cls.check_chatgpt_thread(message.channel.id)):
-					await chat_openai_cls.response_chatgpt(message.channel,message.content)
-				#暫定処置：時間切れになったスレッドのログを削除する
-				chat_openai_cls.delete_chat_log()
-			if(live_scheduler_cls != None and live_scheduler_config["commands"]["schedule-edit"]["use"]==True):
-				if(live_scheduler_cls.check_schedule_editing(message.channel.id)):
-					await live_scheduler_cls.edit_schedule(message.channel,message.content)
-	
-	#それ以外はコマンド実行
-	if message.author == client.user or message.author.bot:
-		pass
-	else:
-		pass
-		#await message.channel.send('メッセージを受信しました。')
-	await client.process_commands(message)
+async def on_message(message):  # メッセージをなにかしら受け取ったときの処理
+    if type(message.channel) is discord.Thread:  # スレッドでメッセージを受け取った時
+        if message.author == client.user or message.author.bot:  # メッセージの送り主がbotの時は処理しない
+            pass
+        elif (
+            False
+        ):  # message.channel.id not in allow_recoed_thread_id:  #録画を許可しないスレッドは処理しない
+            pass
+        else:  # ここに保存コマンドを書く
+            # chatgptへの問い合わせ場合
+            if (
+                chat_openai_cls != None
+                and chat_openai_config["commands"]["chat"]["use"] == True
+            ):
+                if chat_openai_cls.check_chatgpt_thread(message.channel.id):
+                    await chat_openai_cls.response_chatgpt(
+                        message.channel, message.content
+                    )
+                # 暫定処置：時間切れになったスレッドのログを削除する
+                chat_openai_cls.delete_chat_log()
+            if (
+                live_scheduler_cls != None
+                and live_scheduler_config["commands"]["schedule-edit"]["use"] == True
+            ):
+                if live_scheduler_cls.check_schedule_editing(message.channel.id):
+                    await live_scheduler_cls.edit_schedule(
+                        message.channel, message.content
+                    )
+
+    # それ以外はコマンド実行
+    if message.author == client.user or message.author.bot:
+        pass
+    else:
+        pass
+        # await message.channel.send('メッセージを受信しました。')
+    await client.process_commands(message)
 
 
 @client.command("bot-help")
 async def wrapper_help(ctx):
-	await help_cls.show_help(ctx,function_config)
+    await help_cls.show_help(ctx, function_config)
 
-#オウム返し
+
+# オウム返し
 @client.command("parrot")
-async def wrapper_parrot(ctx,text):
-	if(parrot_cls != None):
-		await parrot_cls.parrot(ctx,text)
-	else:
-		await ctx.send("この機能は使用できません。")
+async def wrapper_parrot(ctx, text):
+    if parrot_cls != None:
+        await parrot_cls.parrot(ctx, text)
+    else:
+        await ctx.send("この機能は使用できません。")
 
-#chat GPTによるチャット
+
+# chat GPTによるチャット
 @client.command("chat")
-async def wrapper_chat_openai(ctx,text):
-	try:
-		if(chat_openai_cls!=None):
-			chat_openai_cls.delete_chat_log()
-			await chat_openai_cls.new_chat(ctx,text)
-		else:
-			await ctx.send("この機能は使用できません。")
-	except Exception as e:
-		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+async def wrapper_chat_openai(ctx, text):
+    try:
+        if chat_openai_cls != None:
+            chat_openai_cls.delete_chat_log()
+            await chat_openai_cls.new_chat(ctx, text)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
-#スケジュール画像の表示
+
+# スケジュール画像の表示
 @client.command("schedule-print")
 async def wrapper_schedule_print(ctx):
-	try:
-		if(live_scheduler_cls!=None and live_scheduler_config["commands"]["schedule-print"]["use"]==True):
-			await ctx.send("スケジュール画像の生成を受け付けました。\n生成までしばらくお待ちください。")
-			await live_scheduler_cls.print_schedule(ctx)
-			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
-		else:
-			await ctx.send("この機能は使用できません。")
-	except Exception as e:
-		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+    try:
+        if (
+            live_scheduler_cls != None
+            and live_scheduler_config["commands"]["schedule-print"]["use"] == True
+        ):
+            await ctx.send("スケジュール画像の生成を受け付けました。\n生成までしばらくお待ちください。")
+            await live_scheduler_cls.print_schedule(ctx)
+            shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
-#スケジュール画像にグリッドを表示
+
+# スケジュール画像にグリッドを表示
 @client.command("schedule-grid")
 async def wrapper_schedule_grid(ctx):
-	try:
-		if(live_scheduler_cls!=None and live_scheduler_config["commands"]["schedule-grid"]["use"]==True):
-			await ctx.send("グリッドを入れたscheduleのベースイメージを作成中\n生成までしばらくお待ちください。")
-			await live_scheduler_cls.print_grid_schedule_baseimg(ctx)
-			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
-		else:
-			await ctx.send("この機能は使用できません。")
-	except Exception as e:
-		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+    try:
+        if (
+            live_scheduler_cls != None
+            and live_scheduler_config["commands"]["schedule-grid"]["use"] == True
+        ):
+            await ctx.send("グリッドを入れたscheduleのベースイメージを作成中\n生成までしばらくお待ちください。")
+            await live_scheduler_cls.print_grid_schedule_baseimg(ctx)
+            shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
 
 @client.command("schedule-show")
 async def wrapper_schedule_show(ctx):
-	try:
-		if(live_scheduler_cls!=None and live_scheduler_config["commands"]["schedule-show"]["use"]==True):
-			await live_scheduler_cls.show_schedule_data(ctx)
-		else:
-			await ctx.send("この機能は使用できません。")
-	except Exception as e:
-		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+    try:
+        if (
+            live_scheduler_cls != None
+            and live_scheduler_config["commands"]["schedule-show"]["use"] == True
+        ):
+            await live_scheduler_cls.show_schedule_data(ctx)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
 
 @client.command("schedule-edit")
 async def wrapper_schedule_edit(ctx):
-	try:
-		if(live_scheduler_cls!=None  and live_scheduler_config["commands"]["schedule-edit"]["use"]==True):
-			channel = ctx.channel
-			date = datetime.datetime.now()
-			date_str = date.strftime('%Y-%m-%d %H:%M')
-			thread_name = '{}現在のスケジュール'.format(date_str)
-			#スレッドの作成
-			thread = await channel.create_thread(name=thread_name,reason="スケジュール編集",type=discord.ChannelType.public_thread)#スレッドを作る
-			await live_scheduler_cls.edit_schedule(thread)
-			shutil.rmtree(live_scheduler_cls.tmp_dir_path)
-		else:
-			await ctx.send("この機能は使用できません。")
-	except Exception as e:
-		await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
-
-
+    try:
+        if (
+            live_scheduler_cls != None
+            and live_scheduler_config["commands"]["schedule-edit"]["use"] == True
+        ):
+            channel = ctx.channel
+            date = datetime.datetime.now()
+            date_str = date.strftime("%Y-%m-%d %H:%M")
+            thread_name = "{}現在のスケジュール".format(date_str)
+            # スレッドの作成
+            thread = await channel.create_thread(
+                name=thread_name,
+                reason="スケジュール編集",
+                type=discord.ChannelType.public_thread,
+            )  # スレッドを作る
+            await live_scheduler_cls.edit_schedule(thread)
+            shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
 
 # ウェブサーバーを起動する
 # ToDo ない場合は読み込まない
-if(common_config["use_replit"]):
-	keep_alive()
+if common_config["use_replit"]:
+    keep_alive()
 
 client.run(discord_api_key)
