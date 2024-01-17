@@ -27,7 +27,7 @@ class ChatOpenai:
             now_time = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))
             delta = now_time - create_time
             if delta.days >= 1:
-                del message_dic[thread_id]
+                del self.message_dic[thread_id]
 
     def add_assistant_chat_log(self, thread_id, text):
         """
