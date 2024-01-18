@@ -26,13 +26,6 @@ def save_config(input1, input2):
 def get_content_title_html(str):
     return str
 
-
-def file_selected(file):
-    print("ファイルが選択されました。")
-    print(file)
-    # print(f.name)
-
-
 def arrenge_length(max_len, list1, list2):
     if max_len < len(list1):
         return list1[:max_len], list2[:max_len]
@@ -112,6 +105,22 @@ def update_number_img(records):
     records["file"] += file_name
     return records
 
+
+def generate_text_boxes(number=3):
+    return [gr.Textbox(f'Text {i+1}') for i in range(number)]
+
+def generate_text_fields():
+    # eventにはクリックしたコンポーネントが含まれています
+    # クリックされたコンポーネントがsubmit_buttonであることを確認
+    gr.HTML(get_content_title_html("parrotに関係する設定"))
+        # 新しいテキストボックスを生成
+    #text_fields = generate_text_boxes()
+        # テキストボックスを表示するための親要素に追加
+    #app.replace(children=[submit_button, *text_fields])
+
+
+def submit_callback(number, **text_fields):
+    return f'Number: {number}, Text Fields: {text_fields}'
 
 interfaces = {}
 with gr.Blocks(title="config_maker") as app:
@@ -298,6 +307,10 @@ with gr.Blocks(title="config_maker") as app:
             inputs=interfaces["live_scheduler"]["files"]["number_img"],
             outputs=interfaces["live_scheduler"]["files"]["number_img"],
         )
+    with gr.Column():
+        submit_button = gr.Button(value="画像の設定に進む")
+        #submit_button.click(generate_text_fields)
+        submit_button.click(None, js="window.location.reload()")
 
 
 app.launch()
