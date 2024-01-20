@@ -4,6 +4,8 @@ from tkinter import ttk
 from tkinter import filedialog
 import copy
 import sys
+from PIL import Image, ImageTk
+import asyncio
 
 import common
 from common import str_to_bool,wrapper_edit_live_scheduler_img_config,wrapper_edit_live_scheduler_grid_config,wrapper_end_screen
@@ -293,25 +295,280 @@ def edit_live_scheduler_img_config(root):
     submit.grid(row=row, column=col,sticky=tk.NW)
     screen.grid(row=0,column=0)
 
+def calc_new_grid(entrys,grid,menber_num):
+    top_r_y = int(entrys["top_r_y"].get())
+    buttom_r_y = int(entrys["buttom_r_y"].get())
+    row_height = buttom_r_y - top_r_y
+    day_x = int(entrys["day_x"].get())
+    time_x = int(entrys["time_x"].get())
+    content_x = int(entrys["content_x"].get())
+    liver_x = int(entrys["liver_x"].get()) if entrys["liver_x"] != None else None
+    platform_x = int(entrys["platform_x"].get())
+    end_x = int(entrys["end_x"].get())
+    
+    column_size = grid["column_size"]
 
-def edit_live_scheduler_grid_config(root):
+    column_size["day"]["x"] = int(((time_x - day_x)/2)*(6/7))
+    column_size["day"]["y"] = row_height
+
+    column_size["time"]["x"] = int(((content_x - time_x)/5)*(0.615))
+    column_size["time"]["y"] = row_height
+    if(liver_x != None):
+        column_size["content"]["x"] = liver_x - content_x
+        column_size["content"]["y"] = row_height
+        column_size["liver"]["x"] = int((platform_x - liver_x)/menber_num)
+        column_size["liver"]["y"] = row_height
+    else:
+        column_size["content"]["x"] = platform_x - content_x
+        column_size["content"]["y"] = row_height
+    print( end_x, platform_x)
+    column_size["platform"]["x"] = end_x - platform_x
+    column_size["platform"]["y"] = row_height
+
+    column_first_point = grid["column_first_point"]
+    column_first_point["day"]["x"] = day_x
+    column_first_point["day"]["y"] = top_r_y
+
+    column_first_point["time"]["x"] = time_x
+    column_first_point["time"]["y"] = top_r_y
+
+    column_first_point["content"]["x"] = content_x
+    column_first_point["content"]["y"] = top_r_y
+
+    if(liver_x != None):
+        column_first_point["liver"]["x"] = liver_x
+        column_first_point["liver"]["y"] = top_r_y
+    
+    column_first_point["platform"]["x"] = platform_x
+    column_first_point["platform"]["y"] = top_r_y
+
+    grid["column_size"] = column_size
+    grid["column_first_point"] = column_first_point
+    return grid
+
+def show_preview(entrys):
+    #ファイル読み込みの設定
+    def inner():
+        print("show_preview")
+        sys.path.append("./task_scr")
+        import live_scheduler
+        config = common.config["function"]["live_scheduler"]
+        use_drive = common.config["common"]["use_google_drive"]
+        use_service_account = common.config["common"]["use_google_service_account"]
+        gdrive_setting_path = common.config["common"]["google_dirive_setting"]
+        menber_num = len(common.config["function"]["live_scheduler"]["files"]["icons"].keys())
+        config["grid"] = calc_new_grid(entrys,config["grid"],menber_num)
+        print(config)
+        live_scheduler =  live_scheduler.LiveScheduer(config,use_drive,use_service_account,gdrive_setting_path)
+        live_scheduler.preview_schedule_img()
+        
+    return inner
+
+
+def edit_live_scheduler_grid_config():
     sys.path.append("./task_scr")
     import live_scheduler
-    common.screens["live_scheduler"] = tk.Frame(root)
-    screen = common.screens["live_scheduler"]
-    config = common.config["function"]["live_scheduler"]
-    loading = tk.Label(screen, text="Loading...")
-    loading.grid(row=0,column=0,sticky=tk.NW)
-
+    #ファイル読み込みの設定
     config = common.config["function"]["live_scheduler"]
     use_drive = common.config["common"]["use_google_drive"]
     use_service_account = common.config["common"]["use_google_service_account"]
     gdrive_setting_path = common.config["common"]["google_dirive_setting"]
     live_scheduler = live_scheduler.LiveScheduer(config,use_drive,use_service_account,gdrive_setting_path)
-    #load images
-    base_image = live_scheduler.get_schedule_base_image()
-    liver_images = live_scheduler.get_liver_icon()
-    platform_images = live_scheduler.get_live_platform_icon()
-    contents_images = live_scheduler.get_live_contents_icon()
-    number_pictures = live_scheduler.get_number_picture()
+    grid_move_command = [100,10,1,-1,-10,-100]
+    entrys = {}
 
+    files = config["files"]
+
+    icons = None
+    if("icons" in files):
+        icons = files["icons"]
+    contents = files["contents"]
+    platform = files["platform"]
+    number_img  = files["number_img"]
+
+    grid = config["grid"]
+    column_size = grid["column_size"]
+    column_first_point = grid["column_first_point"]
+    
+    #画像の取得
+    #liver_images = live_scheduler.get_liver_icon()
+    #platform_images = live_scheduler.get_live_platform_icon()
+    #contents_images = live_scheduler.get_live_contents_icon()
+    #number_pictures = live_scheduler.get_number_picture()
+    base_image = live_scheduler.get_schedule_base_image()
+
+    # 画面作成
+    version = tk.Tcl().eval('info patchlevel')
+    window = tk.Tk()
+    #window.geometry("400x300")
+    window.title("画像表示：" + version)
+    
+    img_width,img_height= base_image.size
+    #tkinterで表示できるように図のフォーマットを変更
+    base_image = ImageTk.PhotoImage(base_image,master=window)
+
+    # キャンバス作成
+    canvas = tk.Canvas(window, bg="#deb887", height=img_height, width=img_width)
+    # キャンバス表示
+    canvas.grid(row=0, column=0, rowspan=40)
+
+    # キャンバスにイメージを表示
+    canvas.create_image(0, 0, image=base_image, anchor=tk.NW)
+
+    def move_line(move,tag,entry,decide=True):
+        def inner():
+            y_move = ["top_y","buttom_y"]
+            if(tag in y_move):
+                canvas.move(tag,0,move)
+            else:
+                canvas.move(tag,move,0)
+            new_num = int(entry.get()) + move
+            entry.delete(0,tk.END)
+            entry.insert(0,str(new_num))
+        return inner
+    
+    def on_entry_dicide(tag,entry):#デバッグして修正
+        def inner():
+            item_ids = canvas.find_withtag(tag)
+            coords = canvas.coords(item_ids[0])
+            y_move = ["top_y","buttom_y"]
+            try:
+                new_point = int(entry.get())
+                print(new_point)
+                if(tag in y_move):
+                    move = int(new_point) - int(coords[1])
+                    canvas.move(tag,0,move)
+                else:
+                    move = int(new_point) - int(coords[0])
+                    canvas.move(tag,move,0)
+            except:
+                pass
+        return inner
+
+    def make_arrange_button(window,entry,tag):
+        for i,button_label in enumerate(grid_move_command):
+            if(button_label > 0):
+                #command の引数にroot,top_r_y_entryとtag名,row
+                button = ttk.Button(window, text="+{}".format(button_label),command=move_line(button_label,tag,entry))
+                button.grid(row=row,column=2+i,sticky=tk.NW)
+            else:
+                button = ttk.Button(window, text="{}".format(button_label),command=move_line(button_label,tag,entry))
+                button.grid(row=row,column=2+i,sticky=tk.NW)
+            button = ttk.Button(window, text="入力欄の値を反映",command=on_entry_dicide(tag,entry))
+            button.grid(row=row+1,column=2,columnspan=2,sticky=tk.NW)
+
+    #１行目の枠の幅を示すための線の描画
+    row = 0
+    top_r_y = int(column_first_point["day"]["y"])
+    canvas.create_line(0, top_r_y, img_width, top_r_y, fill = "Blue", width = 2,tag="top_y")
+    label = tk.Label(window, text="1行目の上辺に合わせる（青色の線）")
+    label.grid(row=row,column=1,columnspan=3,sticky=tk.NW)
+    top_r_y_entry = ttk.Entry(window, width=10)
+    top_r_y_entry.insert(tk.END,column_first_point["day"]["y"])
+    row += 1
+    top_r_y_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,top_r_y_entry,"top_y")
+    row += 3
+    entrys["top_r_y"] = top_r_y_entry
+
+    buttom_r_y = int(column_first_point["day"]["y"])+int(column_size["day"]["y"])
+    canvas.create_line(0, buttom_r_y, img_width, buttom_r_y, fill = "red", width = 2,tag="buttom_y")
+    label = tk.Label(window, text="1行目の下辺に合わせる（赤色の線）")
+    label.grid(row=row,column=1,columnspan=3,sticky=tk.NW)
+    buttom_r_y_entry = ttk.Entry(window, width=10)
+    buttom_r_y_entry.insert(tk.END,str(buttom_r_y))
+    row += 1
+    buttom_r_y_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,buttom_r_y_entry,"buttom_y")
+    row += 3
+    entrys["buttom_r_y"] = buttom_r_y_entry
+
+
+    #日付の枠
+    day_x = int(column_first_point["day"]["x"])
+    canvas.create_line(day_x, 0, day_x, img_height, fill = "green", width = 2,tag="day_x")
+    label = tk.Label(window, text="日付の枠の左辺に合わせる（緑色の線）")
+    label.grid(row=row,column=1,columnspan=3,sticky=tk.NW)
+    day_entry = ttk.Entry(window, width=10)
+    day_entry.insert(tk.END,column_first_point["day"]["x"])
+    row += 1
+    day_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,day_entry,"day_x")
+    row += 3
+    entrys["day_x"] = day_entry
+
+
+    #time
+    time_x = int(column_first_point["time"]["x"])
+    canvas.create_line(time_x, 0, time_x, img_height, fill = "yellow", width = 2,tag="time_x")
+    label = tk.Label(window, text="配信開始時間の枠の左辺に合わせる（黄色の線）")
+    label.grid(row=row,column=1,columnspan=4,sticky=tk.NW)
+    time_entry = ttk.Entry(window, width=10)
+    time_entry.insert(tk.END,column_first_point["time"]["x"])
+    row += 1
+    time_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,time_entry,"time_x")
+    row += 3
+    entrys["time_x"] = time_entry
+
+    #content
+    content_x = int(column_first_point["content"]["x"])
+    canvas.create_line(content_x, 0, content_x, img_height, fill = "MediumPurple", width = 1,tag="content_x")
+    label = tk.Label(window, text="配信内容の枠の左辺に合わせる（紫色の線）")
+    label.grid(row=row,column=1,columnspan=4,sticky=tk.NW)
+    content_entry = ttk.Entry(window, width=10)
+    content_entry.insert(tk.END,column_first_point["content"]["x"])
+    row += 1
+    content_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,content_entry,"content_x")
+    row += 3
+    entrys["content_x"] = content_entry
+
+
+    #liver
+    if(icons != None):
+        liver_x = int(column_first_point["liver"]["x"])
+        canvas.create_line(liver_x, 0, liver_x, img_height, fill = "cyan", width = 1,tag="liver_x")
+        label = tk.Label(window, text="メンバーの枠の左辺に合わせる（水色の線）")
+        label.grid(row=row,column=1,columnspan=4,sticky=tk.NW)
+        liver_entry = ttk.Entry(window, width=10)
+        liver_entry.insert(tk.END,column_first_point["liver"]["x"])
+        row += 1
+        liver_entry.grid(row=row,column=1,sticky=tk.NW)
+        make_arrange_button(window,liver_entry,"liver_x")
+        row += 3
+        entrys["liver_x"] = liver_entry
+    else:
+        entrys["liver_x"] = None
+
+    #platform
+    platform_x = int(column_first_point["platform"]["x"])
+    canvas.create_line(platform_x, 0, platform_x, img_height, fill = "chartreuse", width = 1,tag="platform_x")
+    label = tk.Label(window, text="サイトの枠の左辺に合わせる（黄緑の線）")
+    label.grid(row=row,column=1,columnspan=4,sticky=tk.NW)
+    platform_entry = ttk.Entry(window, width=10)
+    platform_entry.insert(tk.END,platform_x)
+    row += 1
+    platform_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,platform_entry,"platform_x")
+    row += 3
+    entrys["platform_x"] = platform_entry
+
+    #end
+    end_x = int(column_first_point["platform"]["x"]) + int(column_size["platform"]["x"])
+    canvas.create_line(end_x, 0, end_x, img_height, fill = "firebrick1", width = 1,tag="platform_x")
+    label = tk.Label(window, text="サイトの枠の右辺に合わせる（オレンジの線）")
+    label.grid(row=row,column=1,columnspan=4,sticky=tk.NW)
+    end_entry = ttk.Entry(window, width=10)
+    end_entry.insert(tk.END,end_x)
+    row += 1
+    end_entry.grid(row=row,column=1,sticky=tk.NW)
+    make_arrange_button(window,end_entry,"platform_x")
+    row += 3
+    entrys["end_x"] = end_entry
+
+    submit = ttk.Button(window, text="プレビュー",command=show_preview(entrys))
+    submit.grid(row=row, column=1,sticky=tk.NW)
+
+
+    window.mainloop()

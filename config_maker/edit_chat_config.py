@@ -71,30 +71,27 @@ def edit_chat_config(root):
     tk.Label(screen, text="").grid(row=row,column=0)
     row += 1
     #max token
-    max_token_ver = StringVar()
-    max_token_ver.set(int(config["max_tokens"]))
-    max_token_label = tk.Label(screen, text="生成する最大token長を入力してください")
-    config_val["max_tokens"] = ttk.Spinbox(screen,from_=0,to=1000, textvariable=max_token_ver,increment=1 )
+    max_token_label = tk.Label(screen, text="生成する最大token長を入力してください(半角数字)")
+    config_val["max_tokens"] = ttk.Entry(screen, width=40)
+    config_val["max_tokens"].insert(tk.END,config["max_tokens"])
     max_token_label.grid(row=row,column=0,columnspan=2,sticky=tk.NW)
     config_val["max_tokens"].grid(row=row,column=3,columnspan=2,sticky=tk.NW)
     row += 1
     tk.Label(screen, text="").grid(row=row,column=0)
     row += 1
     #temperature
-    temp_var = StringVar()
-    temp_var.set(float(config["temperature"]))
-    temperature_label = tk.Label(screen, text="生成する最大token長を入力してください")
-    config_val["temperature"] = ttk.Spinbox(screen,from_=0.01,to=10,textvariable=temp_var,increment=0.05 )
+    temperature_label = tk.Label(screen, text="生成する文字の奇抜性を入力(推奨値：0.7、半角数字で入力)")
+    config_val["temperature"] = ttk.Entry(screen, width=40)
+    config_val["temperature"].insert(tk.END,config["temperature"])
     temperature_label.grid(row=row,column=0,columnspan=2,sticky=tk.NW)
     config_val["temperature"].grid(row=row,column=3,columnspan=2,sticky=tk.NW)
     row += 1
     tk.Label(screen, text="").grid(row=row,column=0)
     row += 1
     #会話ログをどれぐらい残すか
-    int_log_var = StringVar()
-    int_log_var.set(int(config["max_log"]))
-    max_log_label = tk.Label(screen, text="会話の最大ログ数を入力")
-    config_val["max_log"] = ttk.Spinbox(screen,from_=0,to=10,textvariable=int_log_var,increment=1 )
+    max_log_label = tk.Label(screen, text="会話の最大ログ数を入力(半角数字)")
+    config_val["max_log"] = ttk.Entry(screen, width=40)
+    config_val["max_log"].insert(tk.END,config["max_log"])
     max_log_label.grid(row=row,column=0,columnspan=2,sticky=tk.NW)
     config_val["max_log"].grid(row=row,column=3,columnspan=2,sticky=tk.NW)
     row += 1

@@ -85,6 +85,94 @@ class LiveScheduer:
             img.save(img_path)
             await ctx.send(file=discord.File(img_path))
 
+    def preview_schedule_img(self):
+        """
+        configの設定画面からasyncがついた関数が呼べないからprint_scheduleと同じものを追加
+        TODO リファクタリング
+        """
+        schedule_obj = self.get_schedule()
+        base_image = self.get_schedule_base_image()
+        liver_images = self.get_liver_icon()
+        platform_images = self.get_live_platform_icon()
+        contents_images = self.get_live_contents_icon()
+        number_picture = self.get_number_picture()
+        # draw = ImageDraw.Draw(base_image)
+        i = 0
+        for key, val in schedule_obj.items():
+            for column_key, column_point in self.column_first_point.items():
+                loop = 1 if column_key != "liver" else len(val[column_key].keys())
+                size = self.column_size[column_key]
+                if column_key == "day":
+                    j = 0
+                    for d in key:
+                        number_img = self.image_resize(number_picture[d], column_key)
+                        c_x, c_y = self.centering(number_img, column_key)
+                        if j == 1:
+                            c_x = int(c_x * -1)
+                        base_image.paste(
+                            number_img,
+                            (
+                                column_point["x"] + size["x"] * (j) + c_x,
+                                column_point["y"] + size["y"] * i + c_y,
+                            ),
+                            number_img,
+                        )
+                        j += 1
+                elif column_key == "time" and val["開始時間"] is not None:
+                    start_time = val["開始時間"].strftime("%H:%M")
+                    j = 0
+                    for d in start_time:
+                        number_img = self.image_resize(number_picture[d], column_key)
+                        c_x, c_y = self.centering(number_img, column_key)
+                        if j == 1:
+                            c_x = int(c_x * -1)
+                        base_image.paste(
+                            number_img,
+                            (
+                                column_point["x"] + size["x"] * (j) + c_x,
+                                column_point["y"] + size["y"] * i + c_y,
+                            ),
+                            number_img,
+                        )
+                        j += 1
+                elif column_key == "content" and val["内容"] is not None:
+                    c_x, c_y = self.centering(contents_images[val["内容"]], column_key)
+                    base_image.paste(
+                        contents_images[val["内容"]],
+                        (
+                            column_point["x"] + c_x,
+                            column_point["y"] + size["y"] * i + c_y,
+                        ),
+                        contents_images[val["内容"]],
+                    )
+                elif column_key == "liver":
+                    j = 0
+                    for liver_name, state in val["liver"].items():
+                        if state == "o":
+                            c_x, c_y = self.centering(
+                                liver_images[liver_name], column_key
+                            )
+                            base_image.paste(
+                                liver_images[liver_name],
+                                (
+                                    column_point["x"] + size["x"] * (j) + c_x,
+                                    column_point["y"] + size["y"] * i + c_y,
+                                ),
+                                liver_images[liver_name],
+                            )
+                        j += 1
+                elif column_key == "platform" and val["サイト"] is not None:
+                    c_x, c_y = self.centering(platform_images[val["サイト"]], column_key)
+                    base_image.paste(
+                        platform_images[val["サイト"]],
+                        (
+                            column_point["x"] + c_x,
+                            column_point["y"] + size["y"] * i + c_y,
+                        ),
+                    )
+            i += 1
+        base_image.show()
+
     async def print_schedule(self, ctx=None):
         """
         スケジュールをimgに書き込むための関数

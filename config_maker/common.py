@@ -47,7 +47,7 @@ def wrapper_edit_live_scheduler_img_config(root):
 
 def wrapper_edit_live_scheduler_grid_config(root):
     from edit_live_scheduler_config import edit_live_scheduler_grid_config
-    edit_live_scheduler_grid_config(root)
+    edit_live_scheduler_grid_config()
 
 def wrapper_end_screen(root):
     from end_screen import end_screen
