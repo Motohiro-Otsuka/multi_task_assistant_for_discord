@@ -20,7 +20,7 @@ class ChatOpenai:
         self.message_dic = {}
 
     def delete_chat_log(self):
-        for thread_id in self.message_dic.keys():
+        for thread_id in list(self.message_dic.keys()):
             create_time = datetime.datetime.strptime(
                 self.message_dic[thread_id]["start_time"], "%Y-%m-%d %H:%M"
             ).replace(tzinfo=pytz.timezone("Asia/Tokyo"))
