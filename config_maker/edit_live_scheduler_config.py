@@ -109,15 +109,33 @@ def decide_live_scheduler_config(root,screen,config_val):
 
 def decide_live_scheduler_img_config(root,screen):
     def inner():
+        
         config = common.config["function"]["live_scheduler"]["files"]
         for category,category_val in entrys.items():
             for i in range(len(category_val["entry"])):
-                config[category][category_val["entry"][i]] = category_val["img_entry"][i].get()
+                val = category_val["entry"][i].get()
+                img = category_val["img_entry"][i].get()
+                if(val != "" and img != ""):#空欄は対象外
+                    config[category][category_val["entry"][i].get()] = category_val["img_entry"][i].get()
         common.config["function"]["live_scheduler"]["files"] = config
         screen.destroy()
         common.screens["live_scheduler"] = None
         wrapper_edit_live_scheduler_grid_config(root)
     return inner
+
+def dicide_grid_config(window,root,entrys):
+    def inner():
+        import shutil
+        config = common.config["function"]["live_scheduler"]
+        menber_num = len(common.config["function"]["live_scheduler"]["files"]["icons"].keys())
+        config["grid"] = calc_new_grid(entrys,config["grid"],menber_num)
+        common.config["function"]["live_scheduler"] = config
+        wrapper_end_screen(root)
+        window.destroy()
+        if(common.config["common"]["use_google_drive"]):
+            shutil.rmtree(config["files"]["tmp_dir_path"])
+    return inner
+
 
 def edit_live_scheduler_config(root):
     file_label = "ファイルパス"
@@ -311,7 +329,7 @@ def calc_new_grid(entrys,grid,menber_num):
     column_size["day"]["x"] = int(((time_x - day_x)/2)*(6/7))
     column_size["day"]["y"] = row_height
 
-    column_size["time"]["x"] = int(((content_x - time_x)/5)*(0.615))
+    column_size["time"]["x"] = int(((content_x - time_x)/5)*(0.9))
     column_size["time"]["y"] = row_height
     if(liver_x != None):
         column_size["content"]["x"] = liver_x - content_x
@@ -321,7 +339,6 @@ def calc_new_grid(entrys,grid,menber_num):
     else:
         column_size["content"]["x"] = platform_x - content_x
         column_size["content"]["y"] = row_height
-    print( end_x, platform_x)
     column_size["platform"]["x"] = end_x - platform_x
     column_size["platform"]["y"] = row_height
 
@@ -346,26 +363,28 @@ def calc_new_grid(entrys,grid,menber_num):
     grid["column_first_point"] = column_first_point
     return grid
 
-def show_preview(entrys):
+def show_preview(entrys,error_label):
     #ファイル読み込みの設定
     def inner():
-        print("show_preview")
         sys.path.append("./task_scr")
         import live_scheduler
-        config = common.config["function"]["live_scheduler"]
-        use_drive = common.config["common"]["use_google_drive"]
-        use_service_account = common.config["common"]["use_google_service_account"]
-        gdrive_setting_path = common.config["common"]["google_dirive_setting"]
-        menber_num = len(common.config["function"]["live_scheduler"]["files"]["icons"].keys())
-        config["grid"] = calc_new_grid(entrys,config["grid"],menber_num)
-        print(config)
-        live_scheduler =  live_scheduler.LiveScheduer(config,use_drive,use_service_account,gdrive_setting_path)
-        live_scheduler.preview_schedule_img()
-        
+        try:
+            error_label["text"]="※GoogleDriveはpreviewに時間がかかる(30秒～１分程度)。Errorがあればここにでます"
+            config = common.config["function"]["live_scheduler"]
+            use_drive = common.config["common"]["use_google_drive"]
+            use_service_account = common.config["common"]["use_google_service_account"]
+            gdrive_setting_path = common.config["common"]["google_dirive_setting"]
+            menber_num = len(common.config["function"]["live_scheduler"]["files"]["icons"].keys())
+            config["grid"] = calc_new_grid(entrys,config["grid"],menber_num)
+            live_scheduler =  live_scheduler.LiveScheduer(config,use_drive,use_service_account,gdrive_setting_path)
+            live_scheduler.preview_schedule_img()
+        except Exception as e:
+            error_label["text"]="Error!:{}".format(e)
+            
     return inner
 
 
-def edit_live_scheduler_grid_config():
+def edit_live_scheduler_grid_config(root):
     sys.path.append("./task_scr")
     import live_scheduler
     #ファイル読み込みの設定
@@ -526,7 +545,7 @@ def edit_live_scheduler_grid_config():
 
 
     #liver
-    if(icons != None):
+    if(icons != {}):
         liver_x = int(column_first_point["liver"]["x"])
         canvas.create_line(liver_x, 0, liver_x, img_height, fill = "cyan", width = 1,tag="liver_x")
         label = tk.Label(window, text="メンバーの枠の左辺に合わせる（水色の線）")
@@ -567,8 +586,13 @@ def edit_live_scheduler_grid_config():
     row += 3
     entrys["end_x"] = end_entry
 
-    submit = ttk.Button(window, text="プレビュー",command=show_preview(entrys))
+    error_label = tk.Label(window, text="※GoogleDriveはpreviewに時間がかかる(30秒～１分程度)。Errorがあればここにでます。")
+    error_label.grid(row=row+1, column=1,columnspan=5,sticky=tk.NW)
+
+    submit = ttk.Button(window, text="プレビュー)",command=show_preview(entrys,error_label))
     submit.grid(row=row, column=1,sticky=tk.NW)
 
+    submit = ttk.Button(window, text="設定を保存する",command=dicide_grid_config(window,root,entrys))
+    submit.grid(row=row, column=2,sticky=tk.NW,)
 
     window.mainloop()

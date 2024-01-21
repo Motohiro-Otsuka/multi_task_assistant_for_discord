@@ -1,4 +1,4 @@
-
+import json
 """
 各画面で使用する共通的な設定など
 """
@@ -20,6 +20,12 @@ def str_to_bool(text):
         return True
     else:
         return False
+
+def save_config():
+    with open("./config/config.json","w",encoding="utf-8") as f :
+        #json.dump(config,f, ensure_ascii=False)
+        f.write(json.dumps(config, ensure_ascii=False, indent=2))
+
 
 def wrapper_show_select_base(root):
     from select_base_config import select_base
@@ -47,8 +53,9 @@ def wrapper_edit_live_scheduler_img_config(root):
 
 def wrapper_edit_live_scheduler_grid_config(root):
     from edit_live_scheduler_config import edit_live_scheduler_grid_config
-    edit_live_scheduler_grid_config()
+    edit_live_scheduler_grid_config(root)
 
 def wrapper_end_screen(root):
     from end_screen import end_screen
+    save_config()
     end_screen(root)
