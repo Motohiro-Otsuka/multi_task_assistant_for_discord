@@ -8,3 +8,4 @@ pyproject.toml
 server.py
 __pycache__/*
 task_scr/__pycache__/*
+config_maker/__pycache__/*
