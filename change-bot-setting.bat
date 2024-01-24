@@ -1,0 +1,1 @@
+python .\config_maker\config_maker.py
