@@ -33,7 +33,7 @@
             },
         "live_scheduler":{
             "use":true,
-            "googleDrive":true,
+            "googleDrive":false,
             "commands":{
                 "schedule-print":{
                     "discription":"スケジュール画像を生成する",

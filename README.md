@@ -3,7 +3,8 @@
 
 機能は、機能一覧に記載の通りである。
 
-また、本READMEは、pythonを使ったことがある人、もしくはプログラミングの経験を有している人向けに記載しており、完全な初心者に対して配慮しきれていない部分があると思いますがご了承ください。
+可能な限り簡単に設定できるように配慮しておりますが、
+どうしてもわからない場合などは、TwitterのDMやgithubのissueでお知らせください
 
 ご利用に際しては、免責事項、ライセンスを一読してからご使用ください。  
 リリースノートは、ReleaseNote.mdをご覧ください。
@@ -18,31 +19,36 @@
   - スケジュール画像のグリッド表示(schedule-grid)
 - 今後も追加予定
 
-# 使い方
-各機能の詳細はdocsディレクトリをご確認ください。  
-以下の説明に（google）と書かれている項目は、googleドライブにあるファイルを、google driveのアプリと連携せずに使用したい場合のみ行う。  
-アプリと連携している場合は、どこかのドライブにマウントされているので、あえて使用する必要はない。
+# セットアップの方法
+## Windows(簡単版)
 1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
 2. [python](https://www.python.org/downloads/)をinstallする。
-3. pipコマンドをinstallする。
-4. （あとでgit cloneをする場合は）gitコマンドをinstallする。
-5. 本リポジトリをclone or ダウンロードする。  
-   - cloneの場合：
-     - `git clone https://github.com/omegarin02/multi_task_assistant_for_discord.git`
-     - `cd multi_task_assistant_for_discord`
-   - ダウンロードの場合：
-     - 画面右上の緑の`code`ボタンをクリックして、`donload zip`をクリックする。
-     - zipファイルを展開する
-     - 以降は、zipファイルを展開したフォルダ or ディレクトリで作業をする
-6. `pip install -r requirements.txt`必用なライブラリをinstallする。
-7. `./config/config_sample.json` を `./config/config.json`にコピーしてconfigファイルを作る※1
-8. (google) [googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「デスクトップアプリケーションの認証情報を承認する」までを行う。※2
-9.  (google) 8で作った `client_secrets.json`はconfig配下に配置する
-10. `python main.py`でボットを起動する。  
-   (google)google driveを使用する場合は初めの１回だけ認証を求められる。その後は、認証情報が `config/saved_credentials.json`に格納される
-11. discordで`/bot-help`と入力し、使い方と説明が表示されることを確認する。
+3. Releaseから最新版Source code(zip)をダウンロードする
+4. chatGPTを使うのであれば、openaiからOPENAIのAPIkeyを取得する。
+   - 他の方の記事ですが参考→[OpenAIのAPIキーの発行手順](https://auto-worker.com/blog/?p=6988#:~:text=%E3%82%82%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82-,OpenAI%E3%81%AEAPI%E3%82%AD%E3%83%BC%E3%81%AE%E7%99%BA%E8%A1%8C%E6%89%8B%E9%A0%86,-%E3%81%9D%E3%81%93%E3%81%A7%E3%80%81OpenAI%E3%81%AE)
+5. google driveを使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる
+   - サービスアカウントを使う場合は[こちら参照]()
+6. init.batをダブルクリック
+7. change-bot-setting.batをダブルクリックし、画面の指示に従って入力をする（※1）
 
-## ※1 config.jsonのパラメータ説明
+※1 画面の詳細は、「botの設定方法.pdf」をご覧ください
+
+## Windows(git command利用版)
+1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
+2. [python3](https://www.python.org/downloads/)をinstallする。
+3. `git clone -b ${Release_Tag} https://github.com/omegarin02/multi_task_assistant_for_discord.git`
+4. `pip install -r requirements.txt`
+5. `python3 config/config_maker.py`
+6. 画面の指示に従って入力をする（※1,※2）
+   
+※1 画面の詳細は、「botの設定方法.pdf」をご覧ください  
+※2 UIでの設定が面倒な方は、`config/config_base.json` を編集し、`config/config.json` という名前で保存してください
+
+## MacOS/Linux
+Windows(git command利用版と同じ)
+
+
+## config.jsonのパラメータ説明
 - common要素：botの共通の設定。
   - discord_api_key:  discord botのAPIキーを入力する
   - use_replit: [replit](https://replit.com)を使用する場合、trueにする。また使用する場合は、keepaliveのために冗長構成を持つようにreplitのプロジェクトを立てる必要がある。[参考](https://qiita.com/eureyuri/items/c5f041773c93a54b9f92)
@@ -56,8 +62,7 @@
 
 それ以外の、各機能に依存するパラメータの説明は `doc/`配下に格納しているドキュメントをご覧ください
 
-## ※2 google service accountを使用する場合
-手順8,9の代わりに下記を実施する。
+## google service accountを使用する場合
 1. GCPにアクセスして、サービスアカウントを発行する。
 2. サービスアカウントに対してsecretキーを発行する。
 3. 発行したsecretキーを./config/secret_key.jsonという名前で保存する
