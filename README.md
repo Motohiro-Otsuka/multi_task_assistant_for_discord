@@ -19,6 +19,13 @@
   - スケジュール画像のグリッド表示(schedule-grid)
 - 今後も追加予定
 
+# デモ動画
+
+
+https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/907af0d2-653d-404d-bb9f-26979291a066
+
+
+
 # セットアップの方法
 ## Windows(簡単版)
 1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
