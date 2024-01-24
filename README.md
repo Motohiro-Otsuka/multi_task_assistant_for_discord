@@ -27,7 +27,7 @@
 4. chatGPTを使うのであれば、openaiからOPENAIのAPIkeyを取得する。
    - 他の方の記事ですが参考→[OpenAIのAPIキーの発行手順](https://auto-worker.com/blog/?p=6988#:~:text=%E3%82%82%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82-,OpenAI%E3%81%AEAPI%E3%82%AD%E3%83%BC%E3%81%AE%E7%99%BA%E8%A1%8C%E6%89%8B%E9%A0%86,-%E3%81%9D%E3%81%93%E3%81%A7%E3%80%81OpenAI%E3%81%AE)
 5. google driveを使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる
-   - サービスアカウントを使う場合は[こちら参照]()
+   - サービスアカウントを使う場合は[こちら参照](https://github.com/omegarin02/multi_task_assistant_for_discord/tree/feature/release-v1.0.0#google-service-account%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
 6. init.batをダブルクリック
 7. change-bot-setting.batをダブルクリックし、画面の指示に従って入力をする（※1）
 8. start.batをダブルクリックしてbotを起動する(※2)
@@ -39,11 +39,15 @@
 ## Windows(git command利用版)
 1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
 2. [python3](https://www.python.org/downloads/)をinstallする。
-3. `git clone -b ${Release_Tag} https://github.com/omegarin02/multi_task_assistant_for_discord.git`
-4. `pip install -r requirements.txt`
-5. `python3 config/config_maker.py`
-6. 画面の指示に従って入力をする（※1,※2）
-7. botを起動する
+3. chatGPTを使うのであれば、openaiからOPENAIのAPIkeyを取得する。
+   - 他の方の記事ですが参考→[OpenAIのAPIキーの発行手順](https://auto-worker.com/blog/?p=6988#:~:text=%E3%82%82%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82-,OpenAI%E3%81%AEAPI%E3%82%AD%E3%83%BC%E3%81%AE%E7%99%BA%E8%A1%8C%E6%89%8B%E9%A0%86,-%E3%81%9D%E3%81%93%E3%81%A7%E3%80%81OpenAI%E3%81%AE)
+4. google driveを使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる
+   - サービスアカウントを使う場合は[こちら参照](https://github.com/omegarin02/multi_task_assistant_for_discord/tree/feature/release-v1.0.0#google-service-account%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
+5. `git clone -b ${Release_Tag} https://github.com/omegarin02/multi_task_assistant_for_discord.git`
+6. `pip install -r requirements.txt`
+7. `python3 config/config_maker.py`
+8. 画面の指示に従って入力をする（※1,※2）
+9. botを起動する
   - `python main.py`を実行する
   - ログインしましたと表示されたOKです。
   - ターミナルは閉じないでください
