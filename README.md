@@ -30,6 +30,9 @@
    - サービスアカウントを使う場合は[こちら参照]()
 6. init.batをダブルクリック
 7. change-bot-setting.batをダブルクリックし、画面の指示に従って入力をする（※1）
+8. start.batをダブルクリックしてbotを起動する(※2)
+  - 画面が１つ立ち上がって、「ログインしました」と最後に書かれていればOKです。
+  - この画面は閉じないでください
 
 ※1 画面の詳細は、「botの設定方法.pdf」をご覧ください
 
@@ -40,6 +43,10 @@
 4. `pip install -r requirements.txt`
 5. `python3 config/config_maker.py`
 6. 画面の指示に従って入力をする（※1,※2）
+7. botを起動する
+  - `python main.py`を実行する
+  - ログインしましたと表示されたOKです。
+  - ターミナルは閉じないでください
    
 ※1 画面の詳細は、「botの設定方法.pdf」をご覧ください  
 ※2 UIでの設定が面倒な方は、`config/config_base.json` を編集し、`config/config.json` という名前で保存してください
