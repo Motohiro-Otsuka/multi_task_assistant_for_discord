@@ -189,7 +189,10 @@ async def wrapper_schedule_edit(ctx):
                 type=discord.ChannelType.public_thread,
             )  # スレッドを作る
             await live_scheduler_cls.edit_schedule(thread)
-            shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+            try:
+                shutil.rmtree(live_scheduler_cls.tmp_dir_path)
+            except:
+                pass
         else:
             await ctx.send("この機能は使用できません。")
     except Exception as e:
