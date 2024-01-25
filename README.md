@@ -29,6 +29,13 @@
 https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/907af0d2-653d-404d-bb9f-26979291a066
 
 
+# 必要なPCスペック
+具体的にこのレベルというのはないですが、
+（インストールとかは時間かかりますが）10年前の貧弱なPCでも動きます。  
+※参考までに主は、GCPの無料枠の貧弱なサーバで動かしてます。  
+
+今後のアップデートで、機能によってはハイスペックPCが必要になるかもしれませんが、  
+その機能をOFFにすると、問題なく今の機能はお使いいただけるようにするつもりです。  
 
 # セットアップの方法
 ## Windows(簡単版)
@@ -43,9 +50,11 @@ https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/
 7. change-bot-setting.batをダブルクリックし、画面の指示に従って入力をする（※1）
 8. start.batをダブルクリックしてbotを起動する(※2)
   - 画面が１つ立ち上がって、「ログインしました」と最後に書かれていればOKです。
-  - この画面は閉じないでください
+  - 「ログインしました」と書かれた画面は閉じないでください。※2
 
-※1 画面の詳細は、「botの設定方法.pdf」をご覧ください
+※1 画面の詳細は、「botの設定方法.pdf」をご覧ください 
+※2 画面を閉じたりPCの電源を切ると、botが終了してしまいます。
+
 
 ## Windows(git command利用版)
 1. [こちらのサイト](https://gafuburo.net/how-to-discordbot/)を参考にdiscord botを作成する。
