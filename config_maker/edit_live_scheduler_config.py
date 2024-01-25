@@ -105,7 +105,10 @@ def decide_live_scheduler_config(root, screen, config_val):
         common.config["function"]["live_scheduler"] = config
         screen.destroy()
         common.screens["live_scheduler"] = None
-        wrapper_edit_live_scheduler_img_config(root)
+        if(config["use"] == False or config["commands"]["schedule-print"]== False):
+            wrapper_end_screen(root)
+        else:
+            wrapper_edit_live_scheduler_img_config(root)
 
     return inner
 
@@ -151,9 +154,12 @@ def edit_live_scheduler_config(root):
     file_label = "ファイルパス"
     gDrive_flag = common.config["common"]["use_google_drive"]
     button_state = "normal"
+    google_drive_state = "readonly"
     if gDrive_flag:
         file_label = "Google Driveの共有リンク"
         button_state = "disable"
+    else:
+        google_drive_state = "disable"
     common.screens["live_scheduler"] = tk.Frame(root)
     screen = common.screens["live_scheduler"]
     config = common.config["function"]["live_scheduler"]
@@ -176,7 +182,7 @@ def edit_live_scheduler_config(root):
     row += 1
     # OPENAIのAPIKey入力欄
     GoogleDrive_label = tk.Label(screen, text="Google Driveを使用するかどうか")
-    config_val["googleDrive"] = ttk.Combobox(screen, values=use_flag, state="readonly")
+    config_val["googleDrive"] = ttk.Combobox(screen, values=use_flag, state=google_drive_state)
     if config["googleDrive"]:
         config_val["googleDrive"].current(0)
     else:
