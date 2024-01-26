@@ -44,7 +44,7 @@ https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/
 3. Releaseから最新版Source code(zip)をダウンロードする。
 4. chatGPTを使うのであれば、openaiからOPENAIのAPIkeyを取得する。使わない場合は次へ。
    - 他の方の記事ですが参考→[OpenAIのAPIキーの発行手順](https://auto-worker.com/blog/?p=6988#:~:text=%E3%82%82%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82-,OpenAI%E3%81%AEAPI%E3%82%AD%E3%83%BC%E3%81%AE%E7%99%BA%E8%A1%8C%E6%89%8B%E9%A0%86,-%E3%81%9D%E3%81%93%E3%81%A7%E3%80%81OpenAI%E3%81%AE)
-5. google driveを使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる。使わない場合は次へ。
+5. google driveをGoogle Driveアプリを使用せずに、使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる。使わない場合は次へ。
    - サービスアカウントを使う場合は[こちら参照](https://github.com/omegarin02/multi_task_assistant_for_discord/tree/feature/release-v1.0.0#google-service-account%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
 6. init.batをダブルクリック
 7. change-bot-setting.batをダブルクリックし、画面の指示に従って入力をする（※1）
@@ -61,7 +61,7 @@ https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/
 2. [python3](https://www.python.org/downloads/)をinstallする。
 3. chatGPTを使うのであれば、openaiからOPENAIのAPIkeyを取得する。
    - 他の方の記事ですが参考→[OpenAIのAPIキーの発行手順](https://auto-worker.com/blog/?p=6988#:~:text=%E3%82%82%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82-,OpenAI%E3%81%AEAPI%E3%82%AD%E3%83%BC%E3%81%AE%E7%99%BA%E8%A1%8C%E6%89%8B%E9%A0%86,-%E3%81%9D%E3%81%93%E3%81%A7%E3%80%81OpenAI%E3%81%AE)
-4. google driveを使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる
+4. google driveをAPI経由で使うのであれば、[Googleのドキュメント](https://developers.google.com/drive/api/quickstart/python?hl=ja)を参考に、「Googleclientライブラリをインストールする」の手前の手順までやる
    - サービスアカウントを使う場合は[こちら参照](https://github.com/omegarin02/multi_task_assistant_for_discord/tree/feature/release-v1.0.0#google-service-account%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
 5. `git clone -b ${Release_Tag} https://github.com/omegarin02/multi_task_assistant_for_discord.git`
 6. `pip install -r requirements.txt`
@@ -118,10 +118,10 @@ Windows(git command利用版と同じ)
 | 非営利目的での利用 | 可 |  可 | 可 | 可 | 可 |　
 | 改造したものの公開する際のライセンス継承範囲 | コードのみ | コードのみ※4 | 資材一式 | 資材一式 | 資材一式 |
 
-※1 「事務所所属ライバー」、「ライバー事務所」、「個人事業主」、「法人」以外の利用者。
+※1 「事務所所属ライバー」、「ライバー事務所」、「個人事業主」、「法人」以外の利用者。  
 ※2 ご自身の任意のタイミングで、SNSや配信を通じて本ツールを使っていること（本リポジトリへのリンクや、作者のSNS）を書いていただけるだけで大丈夫です。   
-※3 事業収入250万円未満は可 
-※4 ライバー事務所の力を借りずに、自力で編集したものに限る。
+※3 事業収入250万円未満は可  
+※4 ライバー事務所の力を借りずに、自力で編集したものに限る。  
 
 # 最後に
 ### 開発に対する思い
