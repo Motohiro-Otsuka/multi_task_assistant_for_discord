@@ -26,7 +26,9 @@
 # デモ動画
 
 
-https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/907af0d2-653d-404d-bb9f-26979291a066
+
+https://github.com/omegarin02/multi_task_assistant_for_discord/assets/107312091/2488c181-4a19-4bbb-9c7b-bc60b0dd3e52
+
 
 
 # 必要なPCスペック
