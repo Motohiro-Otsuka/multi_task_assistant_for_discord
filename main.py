@@ -112,11 +112,11 @@ async def wrapper_parrot(ctx, text):
 
 # chat GPTによるチャット
 @client.command("chat")
-async def wrapper_chat_openai(ctx, text):
+async def wrapper_chat_openai(ctx):
     try:
         if chat_openai_cls != None:
             chat_openai_cls.delete_chat_log()
-            await chat_openai_cls.new_chat(ctx, text)
+            await chat_openai_cls.new_chat(ctx)
         else:
             await ctx.send("この機能は使用できません。")
     except Exception as e:

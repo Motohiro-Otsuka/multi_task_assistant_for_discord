@@ -51,20 +51,9 @@ class ChatOpenai:
         chat-gptに問い合わせるためのpromptを作る関数
         """
         # threadに１投稿目の時
-        prompt = None
-        if thread_id not in self.message_dic:
-            prompt = [
-                {"role": "system", "content": self.config["system_prompt"]},
-                {"role": "user", "content": text},
-            ]
-            self.message_dic[thread_id] = {}
-            self.message_dic[thread_id]["prompt"] = prompt
-            date = datetime.datetime.now()
-            self.message_dic[thread_id]["start_time"] = date.strftime("%Y-%m-%d %H:%M")
-        else:
-            self.message_dic[thread_id]["prompt"].append(
-                {"role": "user", "content": text}
-            )
+        self.message_dic[thread_id]["prompt"].append(
+            {"role": "user", "content": text}
+        )
         # 上限を超えたときの処理を入れる
         while len(self.message_dic[thread_id]) >= int(self.log_num) + 1:
             del self.message_dic[thread_id]["prompt"][1]
@@ -96,9 +85,9 @@ class ChatOpenai:
         self.add_assistant_chat_log(thread.id, response)
         await thread.send(response)
 
-    async def new_chat(self, ctx, text):
+    async def new_chat(self, ctx):
         """
-        /chatコマンドが呼ばれた時の処理。新たにスレッドを立てて、chat-gptのレスポンスを返す関数
+        /chatコマンドが呼ばれた時の処理。新たにスレッドを立てsystemプロンプトを返す
         """
         channel = ctx.channel  # メッセージがあったチャンネルの取得
         # スレッド名の定義
@@ -113,5 +102,12 @@ class ChatOpenai:
             auto_archive_duration=60,
         )  # スレッドを作る
         # メッセージを送信してスレッドを開始します。
-        # await thread.send("/chat\n入力："+text+"\n解答作成中です\n")
-        await self.response_chatgpt(thread, text)
+        prompt = [
+                {"role": "system", "content": self.config["system_prompt"]},
+            ]
+        self.message_dic[thread.id] = {}
+        self.message_dic[thread.id]["prompt"] = prompt
+        date = datetime.datetime.now()
+        self.message_dic[thread.id]["start_time"] = date.strftime("%Y-%m-%d %H:%M")
+        await thread.send("現在のGPTの役割を示す文章：{}\nこのスレッドで会話を続けてください".format(self.config["system_prompt"]))
+        #await self.response_chatgpt(thread, text)
