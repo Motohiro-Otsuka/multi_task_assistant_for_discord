@@ -189,22 +189,23 @@ class LiveScheduer:
             for column_key, column_point in self.column_first_point.items():
                 loop = 1 if column_key != "liver" else len(val[column_key].keys())
                 size = self.column_size[column_key]
-                if column_key == "day":
+                if column_key == "day" :
                     j = 0
-                    for d in key:
-                        number_img = self.image_resize(number_picture[d], column_key)
-                        c_x, c_y = self.centering(number_img, column_key)
-                        if j == 1:
-                            c_x = int(c_x * -1)
-                        base_image.paste(
-                            number_img,
-                            (
-                                column_point["x"] + size["x"] * (j) + c_x,
-                                column_point["y"] + size["y"] * i + c_y,
-                            ),
-                            number_img,
-                        )
-                        j += 1
+                    if column_point["x"] >= 0:
+                        for d in key:
+                            number_img = self.image_resize(number_picture[d], column_key)
+                            c_x, c_y = self.centering(number_img, column_key)
+                            if j == 1:
+                                c_x = int(c_x * -1)
+                            base_image.paste(
+                                number_img,
+                                (
+                                    column_point["x"] + size["x"] * (j) + c_x,
+                                    column_point["y"] + size["y"] * i + c_y,
+                                ),
+                                number_img,
+                            )
+                            j += 1
                 elif column_key == "time" and val["開始時間"] is not None:
                     start_time = val["開始時間"].strftime("%H:%M")
                     j = 0
