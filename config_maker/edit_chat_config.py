@@ -15,7 +15,7 @@ def decide_chat_config(root, screen, config_val):
                 if key == "use":
                     config[key] = str_to_bool(config_val[key].get())
                 else:
-                    config[key] = config_val["use"].get()
+                    config[key] = config_val[key].get()
         for key, val in config_val["commands"].items():
             config["commands"][key]["discription"] = val["discription"].get()
             config["commands"][key]["use"] = str_to_bool(val["use"].get())
