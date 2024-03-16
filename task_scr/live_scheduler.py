@@ -107,8 +107,6 @@ class LiveScheduer:
                     for d in key:
                         number_img = self.image_resize(number_picture[d], column_key)
                         c_x, c_y = self.centering(number_img, column_key)
-                        if j == 1:
-                            c_x = int(c_x * -1)
                         base_image.paste(
                             number_img,
                             (
@@ -212,8 +210,6 @@ class LiveScheduer:
                     for d in start_time:
                         number_img = self.image_resize(number_picture[d], column_key)
                         c_x, c_y = self.centering(number_img, column_key)
-                        if j == 1:
-                            c_x = int(c_x * -1)
                         base_image.paste(
                             number_img,
                             (
@@ -292,7 +288,10 @@ class LiveScheduer:
             if column_x_size / img_x < column_y_size / img_y
             else column_y_size / img_y
         )
-        content_scale = content_scale - 0.05
+        if(column_name == "time" and column_name == "liver" ):
+            content_scale = content_scale 
+        else:
+            content_scale = content_scale - 0.03
         return img.resize((int(img_x * content_scale), int(img_y * content_scale)))
 
     def get_image(self, img_id):
