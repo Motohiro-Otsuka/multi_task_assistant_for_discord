@@ -20,7 +20,7 @@
             "use":true,
             "commands":{
                 "chat":{
-                    "discription":"chatGPTを使ってチャットボットの応答をする\n/chat GPTに問い合わせる文章\nを入力して使う",
+                    "discription":"chatGPTを使ってチャットボットの応答をする\n/chatコマンドでスレッドが立ち上がるのでそのスレッドで会話する",
                     "use":true
                 }
             },
