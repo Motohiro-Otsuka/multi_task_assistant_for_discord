@@ -132,6 +132,17 @@
                     }
                 }
             }
+        },
+        "draw_ai":{
+            "use":true,
+            "commands":{
+                "draw":{
+                    "discription":"お絵描きAI機能を利用する",
+                    "use":true
+                }
+            },
+            "up_time":500,
+            "host_name":""
         }
     }
 }

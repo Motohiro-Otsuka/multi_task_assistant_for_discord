@@ -3,7 +3,7 @@ from discord.ext import commands
 import json
 import shutil
 import datetime
-from task_scr import help, parrot, chat_openai, live_scheduler
+from task_scr import help, parrot, chat_openai, live_scheduler, draw_ai
 
 # configの読み込み
 config_file = open("./config/config.json", "r", encoding="utf-8")
@@ -14,6 +14,7 @@ function_config = config["function"]
 parrot_config = function_config["parrot"]
 chat_openai_config = function_config["chat_openai"]
 live_scheduler_config = function_config["live_scheduler"]
+draw_ai_config = function_config["draw_ai"]
 
 ## 各機能ごとのconfig取り出し
 help_cls = help.ShowHelp()
@@ -33,6 +34,7 @@ live_scheduler_cls = (
     if live_scheduler_config["use"] == True
     else None
 )
+draw_ai_cls = draw_ai.DrawAi(draw_ai_config) if draw_ai_config["use"] == True else None
 
 ##必用な設定値を読み出し
 discord_api_key = common_config["discord_api_key"]
@@ -78,6 +80,7 @@ async def on_message(message):  # メッセージをなにかしら受け取っ�
                     )
                 # 暫定処置：時間切れになったスレッドのログを削除する
                 chat_openai_cls.delete_chat_log()
+            #Live schedulerの問い合わせの場合
             if (
                 live_scheduler_cls != None
                 and live_scheduler_config["commands"]["schedule-edit"]["use"] == True
@@ -86,6 +89,16 @@ async def on_message(message):  # メッセージをなにかしら受け取っ�
                     await live_scheduler_cls.edit_schedule(
                         message.channel, message.content
                     )
+            # お絵描きAIの問い合わせの場合
+            if (
+                draw_ai_cls != None
+                and draw_ai_config["commands"]["draw"]["use"] == True
+            ):
+                if draw_ai_cls.check_draw_ai_thread(message.channel.id):
+                    await draw_ai_cls.draw_picture(
+                        message.channel, message.content
+                    )
+
 
     # それ以外はコマンド実行
     if message.author == client.user or message.author.bot:
@@ -122,6 +135,17 @@ async def wrapper_chat_openai(ctx):
     except Exception as e:
         await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
+
+# chat GPTによるチャット
+@client.command("draw")
+async def wrapper_draw_ai(ctx):
+    try:
+        if draw_ai_cls != None:
+            await draw_ai_cls.new_chat(ctx)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
 
 # スケジュール画像の表示
 @client.command("schedule-print")
