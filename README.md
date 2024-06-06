@@ -143,5 +143,5 @@ Windows(git command利用版と同じ)
 使ってくださっている方がいると、今後の活動・開発の励みになりますので  
 何卒よろしくお願い申し上げます。  
 
-Twitter：[オメガりん](https://twitter.com/omegarin02)   
-配信チーム：flare(アカウント作成検討中)
+Twitter：[オメガりん](https://x.com/Flare_omegarin)   
+配信チーム：[FlareLiveTM](https://twitter.com/Flare_Live_TM)
