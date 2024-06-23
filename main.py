@@ -1,9 +1,9 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands,tasks
 import json
 import shutil
 import datetime
-from task_scr import help, parrot, chat_openai, live_scheduler
+from task_scr import help, parrot, chat_openai, live_scheduler, auto_post_arrange_schedule
 
 # configの読み込み
 config_file = open("./config/config.json", "r", encoding="utf-8")
@@ -14,6 +14,7 @@ function_config = config["function"]
 parrot_config = function_config["parrot"]
 chat_openai_config = function_config["chat_openai"]
 live_scheduler_config = function_config["live_scheduler"]
+auto_post_arrange_schedule_config = function_config["auto_post_arrange_schedule"]
 
 ## 各機能ごとのconfig取り出し
 help_cls = help.ShowHelp()
@@ -31,6 +32,14 @@ live_scheduler_cls = (
         common_config["google_dirive_setting"],
     )
     if live_scheduler_config["use"] == True
+    else None
+)
+
+auto_post_arrange_schedule_cls = (
+    auto_post_arrange_schedule.AutoPostArrangeSchedule(
+        auto_post_arrange_schedule_config["setting"]
+    )
+    if auto_post_arrange_schedule_config["use"] == True
     else None
 )
 
@@ -52,9 +61,19 @@ client = commands.Bot(command_prefix="/", intents=intents)
 
 
 # bot用スクリプト
+@tasks.loop(minutes=1)
+async def wrapper_auto_post_arrange_schedule():
+    print("call")
+    print(auto_post_arrange_schedule_cls.send_channel)
+    ctx = client.get_channel(1228315574510293104)
+    print(ctx)
+    await auto_post_arrange_schedule_cls.scheduled_message(ctx)
+    
+
 @client.event
 async def on_ready():
     print("ログインしました")
+    wrapper_auto_post_arrange_schedule.start()
 
 
 @client.event
@@ -197,6 +216,7 @@ async def wrapper_schedule_edit(ctx):
             await ctx.send("この機能は使用できません。")
     except Exception as e:
         await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
 
 
 # ウェブサーバーを起動する

@@ -129,6 +129,29 @@
                     }
                 }
             }
+        },
+        "auto_post_arrange_schedule":{
+            "use":true,
+            "commands":{
+                "set-default-schedule":{
+                    "discription":"defaultのスケジュール文を変更する。※{day+1}と入力すると投稿日+1日の日付が自動的に入る。例10日にbotが投稿した場合、{day+3}とあると、13と自動的に入力される。",
+                    "use":true
+                    },
+                "set-post-day":{
+                    "discription":"スケジュール調整のポスト日を決める。",
+                    "use":true
+                },
+                "set-post-time":{
+                    "discription":"スケジュールの調整のポスト時間を決める。例：12:00",
+                    "use":true
+                }
+            },
+            "setting":{
+                "post_day":"木",
+                "post_time":"12:00",
+                "post_content":"",
+                "channel_id":""
+            }
         }
     }
 }
