@@ -105,7 +105,7 @@ def decide_live_scheduler_config(root, screen, config_val):
         common.config["function"]["live_scheduler"] = config
         screen.destroy()
         common.screens["live_scheduler"] = None
-        if(config["use"] == False or config["commands"]["schedule-print"]== False):
+        if config["use"] == False or config["commands"]["schedule-print"] == False:
             wrapper_end_screen(root)
         else:
             wrapper_edit_live_scheduler_img_config(root)
@@ -182,7 +182,9 @@ def edit_live_scheduler_config(root):
     row += 1
     # OPENAIのAPIKey入力欄
     GoogleDrive_label = tk.Label(screen, text="Google Driveを使用するかどうか")
-    config_val["googleDrive"] = ttk.Combobox(screen, values=use_flag, state=google_drive_state)
+    config_val["googleDrive"] = ttk.Combobox(
+        screen, values=use_flag, state=google_drive_state
+    )
     if config["googleDrive"]:
         config_val["googleDrive"].current(0)
     else:

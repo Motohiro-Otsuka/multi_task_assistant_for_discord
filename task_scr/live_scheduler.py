@@ -187,11 +187,13 @@ class LiveScheduer:
             for column_key, column_point in self.column_first_point.items():
                 loop = 1 if column_key != "liver" else len(val[column_key].keys())
                 size = self.column_size[column_key]
-                if column_key == "day" :
+                if column_key == "day":
                     j = 0
                     if column_point["x"] >= 0:
                         for d in key:
-                            number_img = self.image_resize(number_picture[d], column_key)
+                            number_img = self.image_resize(
+                                number_picture[d], column_key
+                            )
                             c_x, c_y = self.centering(number_img, column_key)
                             if j == 1:
                                 c_x = int(c_x * -1)
@@ -288,8 +290,8 @@ class LiveScheduer:
             if column_x_size / img_x < column_y_size / img_y
             else column_y_size / img_y
         )
-        if(column_name == "time" and column_name == "liver" ):
-            content_scale = content_scale 
+        if column_name == "time" and column_name == "liver":
+            content_scale = content_scale
         else:
             content_scale = content_scale - 0.03
         return img.resize((int(img_x * content_scale), int(img_y * content_scale)))

@@ -1,9 +1,15 @@
 import discord
-from discord.ext import commands,tasks
+from discord.ext import commands, tasks
 import json
 import shutil
 import datetime
-from task_scr import help, parrot, chat_openai, live_scheduler, auto_post_arrange_schedule
+from task_scr import (
+    help,
+    parrot,
+    chat_openai,
+    live_scheduler,
+    auto_post_arrange_schedule,
+)
 
 # configの読み込み
 config_file = open("./config/config.json", "r", encoding="utf-8")
@@ -68,7 +74,7 @@ async def wrapper_auto_post_arrange_schedule():
     ctx = client.get_channel(1228315574510293104)
     print(ctx)
     await auto_post_arrange_schedule_cls.scheduled_message(ctx)
-    
+
 
 @client.event
 async def on_ready():
@@ -216,7 +222,6 @@ async def wrapper_schedule_edit(ctx):
             await ctx.send("この機能は使用できません。")
     except Exception as e:
         await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
-
 
 
 # ウェブサーバーを起動する
