@@ -146,12 +146,14 @@
                     "use":true
                 }
             },
-            "setting":{
-                "post_day":"木",
-                "post_time":"12:00",
-                "post_content":"",
-                "channel_id":""
-            }
+            "setting":[
+                {
+                    "post_day":"木",
+                    "post_time":"12:00",
+                    "post_content":"",
+                    "channel_id":""
+                }
+            ]
         }
     }
 }
