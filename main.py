@@ -43,7 +43,7 @@ live_scheduler_cls = (
 
 auto_post_arrange_schedule_cls = (
     auto_post_arrange_schedule.AutoPostArrangeSchedule(
-        auto_post_arrange_schedule_config["setting"]
+        auto_post_arrange_schedule_config["settings"]
     )
     if auto_post_arrange_schedule_config["use"] == True
     else None
@@ -70,8 +70,9 @@ client = commands.Bot(command_prefix="/", intents=intents)
 @tasks.loop(minutes=1)
 async def wrapper_auto_post_arrange_schedule():
     if(auto_post_arrange_schedule_cls is not None):
-        ctx = client.get_channel(auto_post_arrange_schedule_cls.send_channel)
-        await auto_post_arrange_schedule_cls.scheduled_message(ctx)
+        for config in auto_post_arrange_schedule_cls.settings:
+            ctx = client.get_channel(config["channel_id"])
+            await auto_post_arrange_schedule_cls.scheduled_message(ctx,config)
     else:
         pass
 
