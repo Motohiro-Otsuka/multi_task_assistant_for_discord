@@ -69,11 +69,11 @@ client = commands.Bot(command_prefix="/", intents=intents)
 # bot用スクリプト
 @tasks.loop(minutes=1)
 async def wrapper_auto_post_arrange_schedule():
-    print("call")
-    print(auto_post_arrange_schedule_cls.send_channel)
-    ctx = client.get_channel(1228315574510293104)
-    print(ctx)
-    await auto_post_arrange_schedule_cls.scheduled_message(ctx)
+    if(auto_post_arrange_schedule_cls is not None):
+        ctx = client.get_channel(auto_post_arrange_schedule_cls.send_channel)
+        await auto_post_arrange_schedule_cls.scheduled_message(ctx)
+    else:
+        pass
 
 
 @client.event
