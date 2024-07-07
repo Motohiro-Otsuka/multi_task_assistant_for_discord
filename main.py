@@ -9,6 +9,7 @@ from task_scr import (
     chat_openai,
     live_scheduler,
     auto_post_arrange_schedule,
+    draw_openai
 )
 
 # configの読み込み
@@ -19,6 +20,7 @@ function_config = config["function"]
 
 parrot_config = function_config["parrot"]
 chat_openai_config = function_config["chat_openai"]
+draw_openai_config = function_config["draw_openai"]
 live_scheduler_config = function_config["live_scheduler"]
 auto_post_arrange_schedule_config = function_config["auto_post_arrange_schedule"]
 
@@ -30,6 +32,13 @@ chat_openai_cls = (
     if chat_openai_config["use"] == True
     else None
 )
+
+draw_openai_cls = (
+    draw_openai.DrawOpenai(draw_openai_config)
+    if draw_openai_config["use"] == True
+    else None
+)
+
 live_scheduler_cls = (
     live_scheduler.LiveScheduer(
         live_scheduler_config,
@@ -104,6 +113,17 @@ async def on_message(message):  # メッセージをなにかしら受け取っ�
                     )
                 # 暫定処置：時間切れになったスレッドのログを削除する
                 chat_openai_cls.delete_chat_log()
+            # chatgptへの問い合わせ場合
+            if (
+                draw_openai_cls != None
+                and draw_openai_config["commands"]["draw-dalle"]["use"] == True
+            ):
+                if draw_openai_cls.check_chatgpt_thread(message.channel.id):
+                    await draw_openai_cls.response_chatgpt(
+                        message.channel, message.content
+                    )
+                # 暫定処置：時間切れになったスレッドのログを削除する
+                draw_openai_cls.delete_chat_log()
             if (
                 live_scheduler_cls != None
                 and live_scheduler_config["commands"]["schedule-edit"]["use"] == True
@@ -143,6 +163,19 @@ async def wrapper_chat_openai(ctx):
         if chat_openai_cls != None:
             chat_openai_cls.delete_chat_log()
             await chat_openai_cls.new_chat(ctx)
+        else:
+            await ctx.send("この機能は使用できません。")
+    except Exception as e:
+        await ctx.send("Errorが発生しました。次のメッセージをbot管理者にお伝えください。\n {}".format(str(e)))
+
+
+# chat GPTによるチャット
+@client.command("draw-dalle")
+async def wrapper_new_draw_chat(ctx):
+    try:
+        if draw_openai_cls != None:
+            draw_openai_cls.delete_chat_log()
+            await draw_openai_cls.new_draw_chat(ctx)
         else:
             await ctx.send("この機能は使用できません。")
     except Exception as e:
