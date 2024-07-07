@@ -51,9 +51,7 @@ class ChatOpenai:
         chat-gptに問い合わせるためのpromptを作る関数
         """
         # threadに１投稿目の時
-        self.message_dic[thread_id]["prompt"].append(
-            {"role": "user", "content": text}
-        )
+        self.message_dic[thread_id]["prompt"].append({"role": "user", "content": text})
         # 上限を超えたときの処理を入れる
         while len(self.message_dic[thread_id]) >= int(self.log_num) + 1:
             del self.message_dic[thread_id]["prompt"][1]
@@ -103,11 +101,13 @@ class ChatOpenai:
         )  # スレッドを作る
         # メッセージを送信してスレッドを開始します。
         prompt = [
-                {"role": "system", "content": self.config["system_prompt"]},
-            ]
+            {"role": "system", "content": self.config["system_prompt"]},
+        ]
         self.message_dic[thread.id] = {}
         self.message_dic[thread.id]["prompt"] = prompt
         date = datetime.datetime.now()
         self.message_dic[thread.id]["start_time"] = date.strftime("%Y-%m-%d %H:%M")
-        await thread.send("現在のGPTの役割を示す文章：{}\nこのスレッドで会話を続けてください".format(self.config["system_prompt"]))
-        #await self.response_chatgpt(thread, text)
+        await thread.send(
+            "現在のGPTの役割を示す文章：{}\nこのスレッドで会話を続けてください".format(self.config["system_prompt"])
+        )
+        # await self.response_chatgpt(thread, text)
