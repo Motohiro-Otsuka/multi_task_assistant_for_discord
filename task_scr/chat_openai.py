@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 import os
 import openai
+from openai import OpenAI
 import json
 from threading import Thread
 import time
@@ -15,7 +16,8 @@ class ChatOpenai:
         self.config = config
         # openai_conf_obj = open("./config/openai_conf.json","r")
         # openai_config = json.load(openai_conf_obj)
-        openai.api_key = config["OPENAI_API_KEY"]
+        os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]
+        self.client = OpenAI()
         self.log_num = config["max_log"]
         self.message_dic = {}
 
@@ -62,7 +64,7 @@ class ChatOpenai:
         chat gptに問い合わせるための関数
         """
         # APIリクエストの設定
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model=self.config["model"],  # GPTのエンジン名を指定します
             messages=messages,
             max_tokens=int(self.config["max_tokens"]),  # 生成するトークンの最大数
