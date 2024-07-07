@@ -1,6 +1,6 @@
 discord
 flask
-openai==0.28
+openai
 Pillow
 PyDrive2
 google-api-python-client
